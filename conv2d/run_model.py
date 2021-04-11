@@ -1,4 +1,5 @@
 import sys
+import argparse
 from enum import Enum
 
 from pycoral.adapters import common
@@ -12,13 +13,20 @@ def save_image(tensor, path):
     Image.fromarray(np.squeeze(tensor).astype(np.uint8)).save(path)
 
 class Plataform(Enum):
-    TensorFlowLite = 1
-    EdgeTPU = 2
+    TensorFlowLite = "TFLite"
+    EdgeTPU = "EdgeTPU"
 
 def main():
-    model_file = sys.argv[1]
-    input_image = "../couscous.jpg"
-    plataform = Plataform.EdgeTPU
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-M', '--model', required=True,
+                        help='Path to model file (.tflite)')
+    parser.add_argument('-I', '--input', required=True,
+                        help='Path to input image (.jpg,.png,...)')
+    args = parser.parse_args()
+
+    model_file = args.model
+    input_image = args.input
+    plataform = Plataform.EdgeTPU if model_file.endswith("_edgetpu.tflite") else Plataform.TensorFlowLite
 
     # Create interpreter
     if plataform == Plataform.TensorFlowLite:
@@ -51,7 +59,9 @@ def main():
     output = tensor_out.copy()
     
     # Save output image
-    save_image(output, "conv2d_result.jpg")
+    out_file = f"conv2d_result_{plataform.value}.jpg"
+    save_image(output, out_file)
+    print(f"Result saved to `{out_file}`")
 
 
 if __name__ == "__main__":

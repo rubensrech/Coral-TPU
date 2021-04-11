@@ -1,0 +1,2 @@
+rsync -a --exclude 'schema.fbs' --exclude '*.py' tpu-host:coral/elementary-ops/depthwise_conv2d/ ./depthwise_conv2d/
+rsync -a --exclude 'schema.fbs' --exclude '*.py' tpu-host:coral/elementary-ops/conv2d/ ./conv2d/
