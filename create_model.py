@@ -86,6 +86,7 @@ def create_op_tflite_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[
         model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
     elif op == Operation.Conv2d:
         model_creator = lambda: create_conv2d_tf(kernel, input_shape)
+
     model_func = model_creator()
     model_file = create_tflite_model(input_shape, model_name, model_func)
 
@@ -197,44 +198,48 @@ def create_op_edgetpu_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple
         model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
     elif op == Operation.Conv2d:
         model_creator = lambda: create_conv2d_tf(kernel, input_shape)
+
     model_func = model_creator()
     op_code = op.value
     model_file = create_edgetpu_model(input_shape, model_name, model_func, keep_only_op_codes=[op_code])   
 
     return model_file
 
-def create_op_model(op: Operation, input_size: Tuple[int], kernel_size: Tuple[int], kernel_type: Kernel, plataform: Plataform):
-    kernel = None
-    
+def get_input_shape(input_size: Tuple[int], op: Operation):
+    assert len(input_size) == 2, "Input size must be rank 2"
+
     if op == Operation.DepthConv2d:
-        # Tensorflow needs `input_shape` to be rank 4
-        assert len(input_size) == 2, "Input size must be rank 2"
-        input_shape = (1, *input_size, 3)   # 3 channel (R,G,B)
-        C = input_shape[3]
+        input_shape = (1, *input_size, 3)   # 3 channels (R,G,B)
 
-        assert len(kernel_size) == 2, "Kernel size must be rank 2"
+    elif op == Operation.Conv2d:        
+        input_shape = (1, *input_size, 1)   # 1 channel
+    
+    return input_shape
 
-        # Create kernel
+def create_kernel(kernel_type: Kernel, kernel_size: Tuple[int], op: Operation):
+    assert len(kernel_size) == 2, "Kernel size must be rank 2"
+
+    if op == Operation.DepthConv2d:
         if kernel_type == Kernel.Average:    kernel = avg_kernel(kernel_size)
         elif kernel_type == Kernel.Ones:     kernel = ones_kernel(kernel_size)
-        assert kernel is not None, f"Unknown kernel `{kernel_type}`"        
-        kernel = tf.tile(tf.constant(kernel)[:, :, None, None], [1, 1, C, 1])
+        kernel = tf.tile(tf.constant(kernel)[:, :, None, None], [1, 1, 3, 1]) # 3 channels (R,G,B)
 
     elif op == Operation.Conv2d:
-        # Tensorflow needs `input_shape` to be rank 4
-        assert len(input_size) == 2, "Input size must be rank 2"
-        input_shape = (1, *input_size, 1)
-
         # Tensorflow needs `kernel_shape` to be rank 4
-        assert len(kernel_size) == 2, "Kernel size must be rank 2"
         kernel_shape = (*kernel_size, 1, 1)
 
-        # Create kernel
         if kernel_type == Kernel.Average:    kernel = avg_kernel(kernel_shape)
         elif kernel_type == Kernel.Ones:     kernel = ones_kernel(kernel_shape)
-        assert kernel is not None, f"Unknown kernel `{kernel_type}`"
 
-    print(kernel.shape)
+    return kernel
+
+def create_op_model(op: Operation, input_size: Tuple[int], kernel_size: Tuple[int], kernel_type: Kernel, plataform: Plataform):
+    kernel = None
+
+    # Tensorflow needs `input_shape` to be rank 4
+    input_shape = get_input_shape(input_size, op)
+    
+    kernel = create_kernel(kernel_type, kernel_size, op)
 
     # Create OUT_DIR, if it does not exist
     if not os.path.isdir(OUT_DIR): echo_run("mkdir", "-p", OUT_DIR)
