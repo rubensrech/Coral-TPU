@@ -16,6 +16,19 @@ OUT_DIR = f"{Path(__file__).parent}/models/"
 log = logging.getLogger("OpModelCreator")
 log.setLevel(logging.INFO)
 
+class Operation(Enum):
+    # Values are the TensorFlow OP_CODEs
+    Conv2d = "CONV_2D"
+    DepthConv2d = "DEPTHWISE_CONV_2D"
+
+class Plataform(Enum):
+    TensorFlowLite = "TFLite"
+    EdgeTPU = "EdgeTPU"
+
+class Kernel(Enum):
+    Average = "AVERAGE"
+    Ones = "ONES"
+
 # Execute an arbitrary command and echo its output
 def echo_run(*cmd):
     p = subprocess.run(list(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -29,10 +42,9 @@ def echo_run(*cmd):
 def ones_kernel(size: Tuple[int]) -> tf.Tensor:
     return np.ones(size, dtype=np.float32)
 
-
 def avg_kernel(size: Tuple[int]) -> tf.Tensor:
     (H, W, *c) = size
-    return np.ones((H, W), dtype=np.float32)/(H*W)
+    return np.ones(size, dtype=np.float32)/(H*W)
 
 # TensorFlow model
 
@@ -42,6 +54,13 @@ def create_depthwise_conv2d_tf(kernel: tf.Tensor, input_shape: Tuple[int]):
         return tf.nn.depthwise_conv2d(input, kernel, strides=[1] * 4, padding="SAME")
     
     return depthwise_conv2d
+
+def create_conv2d_tf(kernel: tf.Tensor, input_shape: Tuple[int]):
+    @tf.function(input_signature=[tf.TensorSpec(input_shape, tf.float32)])
+    def conv2d(input):
+        return tf.nn.conv2d(input, kernel, strides=[1] * 4, padding="SAME")
+    
+    return conv2d
 
 # TensorFlow Lite model
 
@@ -57,12 +76,16 @@ def create_tflite_model(input_shape: Tuple[int], model_name: str, model_func):
 
     return model_file
 
-def create_depthwise_conv2d_tflite_model(kernel: tf.Tensor, input_shape: Tuple[int]):
-    shape_str = "_".join(map(str, input_shape))
-    model_name = "depthwise_conv2d_%s" % (shape_str)
+def create_op_tflite_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
+    op_name = op.value.lower()
+    in_shape_str = "_".join(map(str, input_shape))
+    model_name = f"{op_name}_{in_shape_str}"
 
     # Create TF Lite model
-    model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
+    if op == Operation.DepthConv2d:
+        model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
+    elif op == Operation.Conv2d:
+        model_creator = lambda: create_conv2d_tf(kernel, input_shape)
     model_func = model_creator()
     model_file = create_tflite_model(input_shape, model_name, model_func)
 
@@ -70,12 +93,12 @@ def create_depthwise_conv2d_tflite_model(kernel: tf.Tensor, input_shape: Tuple[i
 
 # Edge TPU model
 
-def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, keep_only_op_codes=["DEPTHWISE_CONV_2D"]):
+def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, keep_only_op_codes: List[str]):
     def gen_input_samples():
         yield [np.zeros(input_shape, np.float32)]
         yield [np.ones(input_shape, np.float32) * 255]
 
-    log.info("Generating the quantized TensorFlow Lite model ")
+    log.info("Generating the quantized TensorFlow Lite model")
     converter = tf.lite.TFLiteConverter.from_concrete_functions([model_func.get_concrete_function()])
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.representative_dataset = gen_input_samples
@@ -91,11 +114,11 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
 
     # Patching the standard TensorFlow Lite model
     if not Path("schema.fbs").exists():
-        log.info("schema.fbs was not found, downloading")
+        log.info("`schema.fbs` was not found, downloading")
         urllib.request.urlretrieve(
             "https://github.com/tensorflow/tensorflow/raw/master/tensorflow/lite/schema/schema.fbs",
             "schema.fbs")
-        log.info("Downloaded schema.fbs")
+        log.info("Downloaded `schema.fbs`")
 
     log.info("Converting the model from binary flatbuffers to JSON")
     echo_run("flatc", "-t", "--strict-json", "--defaults-json", "-o", OUT_DIR, "schema.fbs", "--", quant_model_file)
@@ -106,15 +129,16 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
         model = json.load(fin)
 
     # Erase all opcodes except the ones listed in `keep_only_op_codes`
-    conv_opcode = -1
-    new_opcodes = []
-    for i, c in enumerate(model["operator_codes"]):
-        if c["builtin_code"] in keep_only_op_codes:
-            new_opcodes.append(c)
-            conv_opcode = i
-    assert conv_opcode >= 0
-    model["operator_codes"] = new_opcodes
-
+    if len(keep_only_op_codes) > 0:
+        conv_opcode = -1
+        new_opcodes = []
+        for i, c in enumerate(model["operator_codes"]):
+            if c["builtin_code"] in keep_only_op_codes:
+                new_opcodes.append(c)
+                conv_opcode = i
+        assert conv_opcode >= 0
+        model["operator_codes"] = new_opcodes
+    
     # Fix the tensor dtypes which are int8 instead of uint8
     # Also remove the multi-channel quantization which is not supported on Edge TPU
     graph = model["subgraphs"][0]
@@ -148,9 +172,10 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
     graph["outputs"][0] = new_ops[0]["outputs"][0]
     model["subgraphs"][0] = graph
 
+    # Write patched JSON model to file
     with open(quant_model_file_json, "w") as fout:
         json.dump(model, fout, indent=4)
-    
+
     log.info("Generating the binary flatbuffers model from JSON")
     echo_run("flatc", "-b", "-o", OUT_DIR, "schema.fbs", quant_model_file_json)
 
@@ -162,55 +187,71 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
     model_file = Path(quant_model_file).with_name(Path(quant_model_file).stem + "_edgetpu.tflite")
     return model_file
 
-def create_depthwise_conv2d_edgetpu_model(kernel: tf.Tensor, input_shape: Tuple[int]):
-    shape_str = "_".join(map(str, input_shape))
-    model_name = "depthwise_conv2d_%s_quant" % (shape_str)
+def create_op_edgetpu_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
+    op_name = op.value.lower()
+    in_shape_str = "_".join(map(str, input_shape))
+    model_name = f"{op_name}_{in_shape_str}_quant"
 
-    # Create Edge TPU model
-    model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
+     # Create TF Lite model
+    if op == Operation.DepthConv2d:
+        model_creator = lambda: create_depthwise_conv2d_tf(kernel, input_shape)
+    elif op == Operation.Conv2d:
+        model_creator = lambda: create_conv2d_tf(kernel, input_shape)
     model_func = model_creator()
-    model_file = create_edgetpu_model(input_shape, model_name, model_func)   
+    op_code = op.value
+    model_file = create_edgetpu_model(input_shape, model_name, model_func, keep_only_op_codes=[op_code])   
 
     return model_file
 
-class Plataform(Enum):
-    TensorFlowLite = "TFLite"
-    EdgeTPU = "EdgeTPU"
-
-class Kernel(Enum):
-    Average = "AVERAGE"
-    Ones = "ONES"
-
-def create_depthwise_conv2d_model(input_size: Tuple[int], kernel_size: Tuple[int], kernel_type: Kernel, plataform: Plataform):
-    # Tensorflow needs `input_shape` to be rank 4
-    assert len(input_size) == 3, "Input size must be rank 3"
-    input_shape = (1, *input_size)
-    C = input_shape[3]
-
-    assert len(kernel_size) == 2, "Kernel shape must be rank 2"
-
-    # Create kernel
+def create_op_model(op: Operation, input_size: Tuple[int], kernel_size: Tuple[int], kernel_type: Kernel, plataform: Plataform):
     kernel = None
-    if kernel_type == Kernel.Average: kernel = avg_kernel(kernel_size)
-    assert kernel is not None, f"Unknown kernel `{kernel_type}`"
+    
+    if op == Operation.DepthConv2d:
+        # Tensorflow needs `input_shape` to be rank 4
+        assert len(input_size) == 2, "Input size must be rank 2"
+        input_shape = (1, *input_size, 3)   # 3 channel (R,G,B)
+        C = input_shape[3]
 
-    # Adjust kernel dims
-    kernel = tf.tile(tf.constant(kernel)[:, :, None, None], [1, 1, C, 1])
+        assert len(kernel_size) == 2, "Kernel size must be rank 2"
+
+        # Create kernel
+        if kernel_type == Kernel.Average:    kernel = avg_kernel(kernel_size)
+        elif kernel_type == Kernel.Ones:     kernel = ones_kernel(kernel_size)
+        assert kernel is not None, f"Unknown kernel `{kernel_type}`"        
+        kernel = tf.tile(tf.constant(kernel)[:, :, None, None], [1, 1, C, 1])
+
+    elif op == Operation.Conv2d:
+        # Tensorflow needs `input_shape` to be rank 4
+        assert len(input_size) == 2, "Input size must be rank 2"
+        input_shape = (1, *input_size, 1)
+
+        # Tensorflow needs `kernel_shape` to be rank 4
+        assert len(kernel_size) == 2, "Kernel size must be rank 2"
+        kernel_shape = (*kernel_size, 1, 1)
+
+        # Create kernel
+        if kernel_type == Kernel.Average:    kernel = avg_kernel(kernel_shape)
+        elif kernel_type == Kernel.Ones:     kernel = ones_kernel(kernel_shape)
+        assert kernel is not None, f"Unknown kernel `{kernel_type}`"
+
+    print(kernel.shape)
 
     # Create OUT_DIR, if it does not exist
     if not os.path.isdir(OUT_DIR): echo_run("mkdir", "-p", OUT_DIR)
 
     # Create model
     if plataform == Plataform.TensorFlowLite:
-        return create_depthwise_conv2d_tflite_model(kernel, input_shape)
+        return create_op_tflite_model(op, kernel, input_shape)
     elif plataform == Plataform.EdgeTPU:
-        return create_depthwise_conv2d_edgetpu_model(kernel, input_shape)
+        return create_op_edgetpu_model(op, kernel, input_shape)
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-I', '--input-size', default="300,300,3",
-                        help='Input size (format: H,W,C)')
-    parser.add_argument('-K', '--kernel-size', default="15,15",
+    parser.add_argument('-O', '--operation', required=True,
+                        help='Operation: DEPTHWISE_CONV_2D | CONV_2D')
+    parser.add_argument('-I', '--input-size', required=True,
+                        help='Input size (format: H,W)')
+    parser.add_argument('-K', '--kernel-size', required=True,
                         help='Kernel size (format: H,W)')
     parser.add_argument('-N', '--kernel-name', default="AVERAGE",
                         help='Kernel name: AVERAGE | ONES')
@@ -218,20 +259,22 @@ def main():
                         help='Plataform: TFLite | EdgeTPU | BOTH')
     args = parser.parse_args()
 
+    op = Operation(args.operation.upper())
     input_size = tuple(map(int, args.input_size.split(",")))
     kernel_size = tuple(map(int, args.kernel_size.split(",")))
     kernel_type = Kernel(args.kernel_name)
 
     print("")
+    print(f"Operation: {op}")
     print(f"Input size: {input_size}")
     print(f"Kernel size: {kernel_size}")
     print(f"Kernel type: {kernel_type}")
 
     def create_model_for_plataform(plataform: Plataform):
-        model_file = create_depthwise_conv2d_model(input_size, kernel_size, kernel_type, plataform)
+        model_file = create_op_model(op, input_size, kernel_size, kernel_type, plataform)
         print(f"Plataform: {plataform}")
         print(f"Model successfully saved to `{model_file}`")
-
+    
     if args.plataform == "BOTH":
         for plataform in Plataform:
             print("")
@@ -239,7 +282,6 @@ def main():
     else:
         plataform = Plataform(args.plataform)
         create_model_for_plataform(plataform)
-    
 
 if __name__ == "__main__":
     main()
