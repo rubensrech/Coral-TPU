@@ -1,1 +1,1 @@
-rsync -a --exclude='.git' ./ tpu-host:coral/elementary-ops/
+rsync -av --exclude='.git' --exclude='*.jpg' ./ rasp-tpu:coral/elementary-ops/
