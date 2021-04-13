@@ -32,12 +32,10 @@ This repository allows user to compile and run elementary (TensorFlow) operation
     ```
 
     **Linux**
-    ```
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
     echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
     sudo apt-get update
     sudo apt-get install edgetpu-compiler
-    ```
 
 ### Run model
 
@@ -45,3 +43,27 @@ For running the created models, it is enough to follow the step in [Coral AI - G
 
 * Edge TPU runtime
 * PyCoral library
+
+## Relevant commands
+
+**Check whether Coral USB is connected**
+```
+lsusb
+
+# Expected:
+Bus 001 Device 005: ID 18d1:9302 Google Inc. 
+```
+
+**udev rules**
+
+Add the following line to */etc/udev/rules.d/99-edgetpu-accelerator.rules* file:
+```
+SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",GROUP="plugdev"
+SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",GROUP="plugdev"
+```
+
+And restart `udev` service:
+```
+sudo service udev restart
+sudo udevadm control --reload-rules
+```
