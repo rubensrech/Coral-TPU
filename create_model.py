@@ -181,7 +181,7 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
     echo_run("flatc", "-b", "-o", OUT_DIR, "schema.fbs", quant_model_file_json)
 
     log.info("Compiling the Edge TPU model")
-    echo_run("edgetpu_compiler", "-s", "-o", OUT_DIR, quant_model_file)
+    echo_run("./edgetpu_compiler.sh", "-s", "-o", OUT_DIR, quant_model_file)
     Path(quant_model_file_json).unlink()
     Path(quant_model_file).with_name(Path(quant_model_file).stem + "_edgetpu.log").unlink()
 
