@@ -59,19 +59,22 @@ def get_output_array(interpreter):
     out_array = np.squeeze(out_tensor).astype(np.uint8)
     return out_array
 
-def get_output_image_filename(operation, plataform):
-    return f"{operation.value}_{plataform.value}_output.jpg"
+def get_model_name(model_file):
+    return Path(model_file).stem
 
-def save_output_image(output, operation, plataform):
-    out_img_file = get_output_image_filename(operation, plataform)
+def get_output_image_filename(model_file):
+    return f"output_{get_model_name(model_file)}.jpg"
+
+def save_output_image(output, model_file):
+    out_img_file = get_output_image_filename(model_file)
     Image.fromarray(output).save(out_img_file)
     print(f"Output image saved to `{out_img_file}`")
 
-def get_output_golden_filename(operation, plataform):
-    return f"golden_{operation.value}_{plataform.value}.npy"
+def get_output_golden_filename(model_file):
+    return f"golden_{get_model_name(model_file)}.npy"
 
-def save_output_golden(output, operation, plataform):
-    out_gold_file = get_output_golden_filename(operation, plataform)
+def save_output_golden(output, model_file):
+    out_gold_file = get_output_golden_filename(model_file)
     np.save(out_gold_file, output)
     print(f"Golden output saved to `{out_gold_file}`")
 
@@ -127,7 +130,7 @@ def main():
 
     if golden_file is None:
         try:
-            dft_golden_file = get_output_golden_filename(operation, plataform)
+            dft_golden_file = get_output_golden_filename(model_file)
             match = check_output_against_golden(output, dft_golden_file)
             t5 = time()
             print(f"Check output: {t5 - t4}s {'(ERROR)' if not match else ''}")
@@ -141,10 +144,10 @@ def main():
             print(f"Could not open golden file `{golden_file}`")
 
     if args.save_image:
-        save_output_image(output, operation, plataform)
+        save_output_image(output, model_file)
 
     if args.save_golden:
-        save_output_golden(output, operation, plataform)
+        save_output_golden(output, model_file)
     
 
 if __name__ == "__main__":
