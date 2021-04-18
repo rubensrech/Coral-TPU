@@ -42,8 +42,8 @@ def create_interpreter(model_file, plataform):
 def set_interpreter_intput(interpreter, input_image, operation):
     size = common.input_size(interpreter)
     if operation == Operation.Conv2d:
-        imgGray = Image.open(input_image).convert('LA').resize(size, Image.ANTIALIAS)
-        input = np.array(imgGray)[:,:,0].reshape((*size, 1))
+        imgGray = Image.open(input_image).convert('L').resize(size, Image.ANTIALIAS)
+        input = np.array(imgGray).reshape((*size, 1))
     elif operation == Operation.DepthConv2d:
         input = Image.open(input_image).convert('RGB').resize(size, Image.ANTIALIAS)
     common.set_input(interpreter, input)
