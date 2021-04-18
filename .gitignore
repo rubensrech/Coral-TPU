@@ -1,6 +1,14 @@
 .DS_Store
+.vscode
+
 *.jpg
+*.bmp
 schema.fbs
+
+lib/
+obj/
+*.o
+*.a 
 
 old_scripts
 tmp
