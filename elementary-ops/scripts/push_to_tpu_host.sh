@@ -1,1 +1,0 @@
-rsync -av --exclude='.git' --exclude='*.jpg' ./ rasp-tpu:coral/elementary-ops/
