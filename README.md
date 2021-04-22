@@ -44,26 +44,38 @@ For running the created models, it is enough to follow the step in [Coral AI - G
 * Edge TPU runtime
 * PyCoral library
 
-## Relevant commands
+## Failed to load delegate from libedgetpu.so.1
 
 **Check whether Coral USB is connected**
 ```
 lsusb
 
 # Expected:
-Bus 001 Device 005: ID 18d1:9302 Google Inc. 
+Bus 001 Device 005: ID 18d1:9302 Google Inc.
+# Or
+Bus 001 Device XXX: ID 1a6e:089a Global ...
 ```
 
 **udev rules**
 
-Add the following line to */etc/udev/rules.d/99-edgetpu-accelerator.rules* file:
+Add the following to */etc/udev/rules.d/99-edgetpu-accelerator.rules* file:
 ```
-SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",GROUP="plugdev"
-SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",GROUP="plugdev"
+SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",MODE="0666",GROUP="plugdev"
+SUBSYSTEM=="usb",ATTRS{idVendor}=="089a",MODE="0666",GROUP="plugdev"
 ```
 
-And restart `udev` service:
+Restart `udev` service:
 ```
 sudo service udev restart
 sudo udevadm control --reload-rules
+```
+
+**Add current user to `plugdev` group**
+```
+sudo usermod -aG plugdev $USER
+```
+
+Restart the system:
+```
+sudo reboot
 ```
