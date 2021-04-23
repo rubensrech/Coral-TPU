@@ -342,7 +342,7 @@ const TfLiteTensor *InvokeInterpreterOrDie(tflite::Interpreter *interpreter) {
     #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
         size_t out_vals_count = out_tensor->bytes / sizeof(uint8_t);
         TfLiteIntArray *out_dims = out_tensor->dims;
-        std::cout << "INFO: Output tensor has " << out_vals_count << " values (";
+        std::cout << "DEBUG: Output tensor has " << out_vals_count << " values (";
         for (int i = 0; i < out_dims->size; i++) 
             std::cout << out_dims->data[i] << (i+1 < out_dims->size ? ", " : ")");
         std::cout << std::endl;
@@ -429,7 +429,7 @@ int CheckOutputAgainstGoldenOrDie(const TfLiteTensor *out_tensor, std::string go
     }
 
     #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
-        std::cout << "INFO: Data from golden file was successfully read" << std:: endl;
+        std::cout << "DEBUG: Data from golden file was successfully read" << std:: endl;
         std::cout << "  - Output data dimensions: ("; 
         for (int i = 0; i < g_out_dims_size; i++) 
             std::cout << g_out_dims[i] << (i+1 < g_out_dims_size ? ", " : ")");
@@ -481,7 +481,7 @@ int main(int argc, char *argv[]) {
     bool save_golden = util::GetBoolArg(argc, argv, "--save-golden", false);
     std::string golden_filename = util::GetGoldenFilenameFromModelFilename(model_filename);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t0 = util::Now();
     #endif  
 
@@ -489,14 +489,14 @@ int main(int argc, char *argv[]) {
     size_t num_devices = 0;
     auto devices = GetEdgeTPUDevicesOrDie(&num_devices);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t1 = util::Now();
         std::cout << "TIMING: Find TPU devices: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
     #endif  
 
     edgetpu_device &device = devices.get()[0];
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_DEBUG
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
         std::cout << "DEBUG: Edge TPU device 0" << std::endl;
         std::cout << "  - Type: " << device.type << " (0: PCI, 1: USB)" << std::endl;
         std::cout << "  - Path: " << device.path << std::endl;
@@ -505,7 +505,7 @@ int main(int argc, char *argv[]) {
     // Load input image
     Image *img = LoadInputImageOrDie(img_filename);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t2 = util::Now();
         std::cout << "TIMING: Load input image: " << util::TimeDiffMs(t1, t2) << "ms" << std::endl;
     #endif  
@@ -513,7 +513,7 @@ int main(int argc, char *argv[]) {
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = LoadModelOrDie(model_filename);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t3 = util::Now();
         std::cout << "TIMING: Load model: " << util::TimeDiffMs(t2, t3) << "ms" << std::endl;
     #endif  
@@ -521,7 +521,7 @@ int main(int argc, char *argv[]) {
     // Create interpreter
     std::unique_ptr<tflite::Interpreter> interpreter = CreateInterpreterOrDie(model.get(), device);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t4 = util::Now();
         std::cout << "TIMING: Create interpreter: " << util::TimeDiffMs(t3, t4) << "ms" << std::endl;
     #endif  
@@ -529,7 +529,7 @@ int main(int argc, char *argv[]) {
     // Set interpreter input
     SetInterpreterInputOrDie(interpreter.get(), img);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t5 = util::Now();
         std::cout << "TIMING: Set interpreter input: " << util::TimeDiffMs(t4, t5) << "ms" << std::endl;
     #endif  
@@ -537,7 +537,7 @@ int main(int argc, char *argv[]) {
     // Run interpreter
     const TfLiteTensor *out_tensor = InvokeInterpreterOrDie(interpreter.get());
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t6 = util::Now();
         std::cout << "TIMING: Run interpreter: " << util::TimeDiffMs(t5, t6) << "ms" << std::endl;
     #endif  
@@ -555,7 +555,7 @@ int main(int argc, char *argv[]) {
         std::cout << "INFO: Output matches golden output (`" << golden_filename << "`)" << std::endl;
     }
 
-    #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t7 = util::Now();
         std::cout << "TIMING: Check output: " << util::TimeDiffMs(t6, t7) << "ms" << std::endl;
     #endif  
