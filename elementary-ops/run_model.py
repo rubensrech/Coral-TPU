@@ -8,26 +8,12 @@ from PIL import Image
 from pathlib import Path
 from pycoral.adapters import common
 
-class Plataform(Enum):
-    TensorFlowLite = "TFLite"
-    EdgeTPU = "EdgeTPU"
+import sys
+sys.path.insert(1, './src')
+import util
+from util import Operation, Plataform
 
-class Operation(Enum):
-    # Values are the model filename prefix
-    Conv2d = "conv_2d"
-    DepthConv2d = "depthwise_conv_2d"
-
-def get_plataform_from_model_name(model_file):
-    return Plataform.EdgeTPU if model_file.endswith("_edgetpu.tflite") else Plataform.TensorFlowLite
-
-def get_op_from_model_name(model_file):
-    operation = None
-    for op in Operation:
-        if Path(model_file).stem.startswith(op.value):
-            operation = op
-            break
-    assert operation is not None, "Unsupported operation"
-    return operation
+GOLDEN_DIR = f"{Path(__file__).parent}/golden"
 
 def create_interpreter(model_file, plataform):
     if plataform == Plataform.TensorFlowLite:
@@ -59,11 +45,8 @@ def get_output_array(interpreter):
     out_array = np.squeeze(out_tensor).astype(np.uint8)
     return out_array
 
-def get_model_name(model_file):
-    return Path(model_file).stem
-
 def get_output_image_filename(model_file):
-    return f"output_{get_model_name(model_file)}.jpg"
+    return f"output_{util.get_model_name(model_file)}.jpg"
 
 def save_output_image(output, model_file):
     out_img_file = get_output_image_filename(model_file)
@@ -71,7 +54,7 @@ def save_output_image(output, model_file):
     print(f"Output image saved to `{out_img_file}`")
 
 def get_output_golden_filename(model_file):
-    return f"golden_{get_model_name(model_file)}.npy"
+    return f"{GOLDEN_DIR}/golden_{util.get_model_name(model_file)}.npy"
 
 def save_output_golden(output, model_file):
     out_gold_file = get_output_golden_filename(model_file)
@@ -104,8 +87,8 @@ def main():
     input_image_file = args.input
     golden_file = args.golden
 
-    plataform = get_plataform_from_model_name(model_file)
-    operation = get_op_from_model_name(model_file)
+    plataform = util.get_plataform_from_model_name(model_file)
+    operation = util.get_op_from_model_name(model_file)
 
     t0 = time()
     interpreter = create_interpreter(model_file, plataform)

@@ -5,6 +5,7 @@
 *.bmp
 schema.fbs
 
+__pycache__
 lib/
 obj/
 *.o

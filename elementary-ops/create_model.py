@@ -11,21 +11,18 @@ from typing import Tuple, Union, List
 import numpy as np
 import tensorflow as tf
 
+import sys
+sys.path.insert(1, './src')
+import util
+from util import Operation, Plataform
+
 np.random.seed(0)
 
-OUT_DIR = f"{Path(__file__).parent}/models/"
+MODELS_DIR = f"{Path(__file__).parent}/models"
+SCRIPTS_DIR = f"{Path(__file__).parent}/scripts"
 
 log = logging.getLogger("OpModelCreator")
 log.setLevel(logging.INFO)
-
-class Operation(Enum):
-    # Values are the TensorFlow OP_CODEs
-    Conv2d = "CONV_2D"
-    DepthConv2d = "DEPTHWISE_CONV_2D"
-
-class Plataform(Enum):
-    TensorFlowLite = "TFLite"
-    EdgeTPU = "EdgeTPU"
 
 class Kernel(Enum):
     Average = "AVERAGE"
@@ -67,7 +64,7 @@ def create_conv2d_tf(kernel: tf.Tensor, input_shape: Tuple[int]):
 # TensorFlow Lite model
 
 def create_tflite_model(input_shape: Tuple[int], model_name: str, model_func):
-    model_file = f"{OUT_DIR}{model_name}.tflite"
+    model_file = f"{MODELS_DIR}/{model_name}.tflite"
     log.info(f"Generating the TensorFlow Lite model ({model_file})")
     
     converter = tf.lite.TFLiteConverter.from_concrete_functions([model_func.get_concrete_function()])
@@ -79,7 +76,7 @@ def create_tflite_model(input_shape: Tuple[int], model_name: str, model_func):
     return model_file
 
 def create_op_tflite_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
-    op_name = op.value.lower()
+    op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
     model_name = f"{op_name}_{in_shape_str}"
 
@@ -111,7 +108,7 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
     converter.inference_output_type = tf.uint8
     tflite_model = converter.convert()
 
-    quant_model_file = f"{OUT_DIR}{model_name}.tflite"
+    quant_model_file = f"{MODELS_DIR}/{model_name}.tflite"
     with open(quant_model_file, "wb") as fout:
         fout.write(tflite_model)
     log.info("Wrote quantized TensorFlow Lite model to %s", quant_model_file)
@@ -125,7 +122,7 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
         log.info("Downloaded `schema.fbs`")
 
     log.info("Converting the model from binary flatbuffers to JSON")
-    echo_run("flatc", "-t", "--strict-json", "--defaults-json", "-o", OUT_DIR, "schema.fbs", "--", quant_model_file)
+    echo_run("flatc", "-t", "--strict-json", "--defaults-json", "-o", MODELS_DIR, "schema.fbs", "--", quant_model_file)
 
     log.info("Patching the model in JSON")
     quant_model_file_json = str(Path(quant_model_file).with_suffix(".json"))
@@ -181,10 +178,10 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
         json.dump(model, fout, indent=4)
 
     log.info("Generating the binary flatbuffers model from JSON")
-    echo_run("flatc", "-b", "-o", OUT_DIR, "schema.fbs", quant_model_file_json)
+    echo_run("flatc", "-b", "-o", MODELS_DIR, "schema.fbs", quant_model_file_json)
 
     log.info("Compiling the Edge TPU model")
-    echo_run("./scripts/edgetpu_compiler.sh", "-s", "-o", OUT_DIR, quant_model_file)
+    echo_run(f"./{SCRIPTS_DIR}/edgetpu_compiler.sh", "-s", "-o", MODELS_DIR, quant_model_file)
     Path(quant_model_file_json).unlink()
     Path(quant_model_file).with_name(Path(quant_model_file).stem + "_edgetpu.log").unlink()
 
@@ -192,7 +189,7 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
     return model_file
 
 def create_op_edgetpu_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
-    op_name = op.value.lower()
+    op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
     model_name = f"{op_name}_{in_shape_str}_quant"
 
@@ -203,7 +200,7 @@ def create_op_edgetpu_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple
         model_creator = lambda: create_conv2d_tf(kernel, input_shape)
 
     model_func = model_creator()
-    op_code = op.value
+    op_code = op.flatbuffers_code()
     model_file = create_edgetpu_model(input_shape, model_name, model_func, keep_only_op_codes=[op_code])   
 
     return model_file
@@ -244,8 +241,8 @@ def create_op_model(op: Operation, input_size: Tuple[int], kernel_size: Tuple[in
     
     kernel = create_kernel(kernel_type, kernel_size, op)
 
-    # Create OUT_DIR, if it does not exist
-    if not os.path.isdir(OUT_DIR): echo_run("mkdir", "-p", OUT_DIR)
+    # Create MODELS_DIR, if it does not exist
+    if not os.path.isdir(MODELS_DIR): echo_run("mkdir", "-p", MODELS_DIR)
 
     # Create model
     if plataform == Plataform.TensorFlowLite:
@@ -267,7 +264,7 @@ def main():
                         help='Plataform: TFLite | EdgeTPU | BOTH')
     args = parser.parse_args()
 
-    op = Operation(args.operation.upper())
+    op = Operation(args.operation)
     input_size = tuple(map(int, args.input_size.split(",")))
     kernel_size = tuple(map(int, args.kernel_size.split(",")))
     kernel_type = Kernel(args.kernel_name)

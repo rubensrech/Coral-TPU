@@ -162,7 +162,8 @@ std::string GetGoldenFilenameFromModelFilename(std::string model_filename) {
     auto ext_pos = model_name.find_last_of(".");
     model_name =  model_name.substr(0, ext_pos);
 
-    std::string golden_filename = "golden_" + model_name + ".out";
+    std::string goldenDir = "golden/";
+    std::string golden_filename = goldenDir + "golden_" + model_name + ".out";
     return golden_filename;
 }
 
