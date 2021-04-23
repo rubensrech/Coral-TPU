@@ -18,9 +18,9 @@
 # 6. Set the paths to the Edge TPU runtime, TensorFlow and TensorFlow Lite lib in
 # 	  `EDGETPU_RUNTIME_DIR`, `TENSORFLOW_DIR` and `TFLITE_AARCH64_LIB_DIR`
 
-EDGETPU_RUNTIME_DIR=/home/carol/coral/edgetpu_runtime
-TENSORFLOW_DIR=/home/carol/coral/tensorflow
-TFLITE_AARCH64_LIB_DIR=/home/carol/coral/tflite-aarch64/lib
+EDGETPU_RUNTIME_DIR=$(CURDIR)/../edgetpu_runtime
+TENSORFLOW_DIR=$(CURDIR)/../tensorflow
+TFLITE_AARCH64_LIB_DIR=$(CURDIR)/../tflite-aarch64/lib
 
 run_model: run_model.cpp
 	aarch64-linux-gnu-g++ -std=c++11 -o run_model run_model.cpp \
