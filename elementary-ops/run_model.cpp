@@ -552,7 +552,7 @@ int main(int argc, char *argv[]) {
     if (errors > 0) {
         std::cout << "INFO: " << errors << " error(s) found in the output" << std::endl;
     } else {
-        std::cout << "INFO: Output matches golden output" << std::endl;
+        std::cout << "INFO: Output matches golden output (`" << golden_filename << "`)" << std::endl;
     }
 
     #if LOGGING_LEVEL >= LOGGING_LEVELS_TIMING
