@@ -80,7 +80,8 @@ def create_tflite_model(input_shape: Tuple[int], model_name: str, model_func):
 def create_op_tflite_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
     op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
-    model_name = f"{op_name}_{in_shape_str}"
+    kernel_shape_str = "_".join(map(str, kernel.shape))
+    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}"
 
     # Create TF Lite model
     if op == Operation.DepthConv2d:
@@ -193,7 +194,8 @@ def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, k
 def create_op_edgetpu_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[int]):
     op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
-    model_name = f"{op_name}_{in_shape_str}_quant"
+    kernel_shape_str = "_".join(map(str, kernel.shape))
+    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}_quant"
 
      # Create TF Lite model
     if op == Operation.DepthConv2d:
