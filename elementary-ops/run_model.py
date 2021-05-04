@@ -28,12 +28,21 @@ def create_interpreter(model_file, plataform):
     return interpreter
 
 def set_interpreter_intput(interpreter, input_image, operation):
+    ext = Path(input_image).suffix
     size = common.input_size(interpreter)
-    if operation == Operation.Conv2d:
-        imgGray = Image.open(input_image).convert('L').resize(size, Image.ANTIALIAS)
-        input = np.array(imgGray).reshape((*size, 1))
-    elif operation == Operation.DepthConv2d:
-        input = Image.open(input_image).convert('RGB').resize(size, Image.ANTIALIAS)
+    
+    if ext == ".npy":
+        input = np.load(input_image)
+
+        if len(input.shape) == 2:
+            input = input[..., np.newaxis]
+    else:
+        if operation == Operation.Conv2d:
+            imgGray = Image.open(input_image).convert('L').resize(size, Image.ANTIALIAS)
+            input = np.array(imgGray).reshape((*size, 1))
+        elif operation == Operation.DepthConv2d:
+            input = Image.open(input_image).convert('RGB').resize(size, Image.ANTIALIAS)
+
     common.set_input(interpreter, input)
 
 def get_input_tensor(interpreter):
