@@ -99,7 +99,7 @@ def create_op_tflite_model(op: Operation, kernel: tf.Tensor, input_shape: Tuple[
 def create_edgetpu_model(input_shape: Tuple[int], model_name: str, model_func, keep_only_op_codes: List[str]):
     def gen_input_samples():
         yield [np.zeros(input_shape, np.float32)]
-        yield [np.random.random_sample(input_shape).astype(np.float32)]
+        yield [np.random.random_sample(input_shape).astype(np.float32) * 255]
         yield [np.ones(input_shape, np.float32) * 255]
 
     log.info("Generating the quantized TensorFlow Lite model")
