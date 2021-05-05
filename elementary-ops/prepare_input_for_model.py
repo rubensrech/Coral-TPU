@@ -68,7 +68,7 @@ def main():
     output_size = dims[1:3]
 
     if image_file is not None:
-        generate_from_input_image(image_file, output_size, op)
+        generate_from_input_image(model_file, image_file, output_size, op)
     else:
         generate_random_input(model_file, output_size, op)
 
