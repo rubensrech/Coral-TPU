@@ -3,6 +3,7 @@
 
 *.jpg
 *.bmp
+*.npy
 schema.fbs
 
 __pycache__
