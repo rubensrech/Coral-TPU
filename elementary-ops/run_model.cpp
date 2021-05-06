@@ -195,7 +195,7 @@ int GetIntArg(int argc, char **argv, const char *arg, int def) {
     for(i = 0; i < argc-1; ++i){
         if(!argv[i]) continue;
         if(0==strcmp(argv[i], arg)){
-            def = atoi(argv[i+1]) != 0;
+            def = atoi(argv[i+1]);
             DeleteArg(argc, argv, i);
             DeleteArg(argc, argv, i);
             break;
@@ -205,7 +205,7 @@ int GetIntArg(int argc, char **argv, const char *arg, int def) {
 }
 
 bool GetBoolArg(int argc, char **argv, const char *arg, bool def) {
-    return (bool)GetIntArg(argc, argv, arg, def);
+    return GetIntArg(argc, argv, arg, def) != 0;
 }
 
 } // namespace util

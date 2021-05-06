@@ -51,7 +51,7 @@ def generate_random_input(model_file, size, op, out_ext):
     output_file = get_output_name(model_file, out_ext)
 
     if out_ext == "bmp":
-        Image.fromarray(rand_input).save(output_file)
+        Image.fromarray(np.squeeze(rand_input)).save(output_file)
     elif out_ext == "npy":
         np.save(output_file, rand_input)
 
