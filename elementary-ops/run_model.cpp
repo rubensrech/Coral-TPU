@@ -616,7 +616,6 @@ int main(int argc, char *argv[]) {
             // Save golden output
             std::string output_golden_file = util::GetDftGoldenFilename(model_filename, img_filename);
             SaveGoldenOutputOrDie(out_tensor, output_golden_file);
-            std::cout << "INFO: Golden output saved to file `" << output_golden_file << "`" << std::endl;
             break;
         } else {
             // Run interpreter
