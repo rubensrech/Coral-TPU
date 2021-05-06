@@ -218,267 +218,15 @@ typedef struct {
     int channels;
 } Image;
 
-std::unique_ptr<edgetpu_device, decltype(&edgetpu_free_devices)> GetEdgeTPUDevicesOrDie(size_t *num_devices) {
-    std::unique_ptr<edgetpu_device, decltype(&edgetpu_free_devices)> devices(
-        edgetpu_list_devices(num_devices), &edgetpu_free_devices);
-
-    if (*num_devices == 0) {
-        std::cerr << "ERROR: No connected TPU found" << std::endl;
-        exit(ERROR_NO_TPU_FOUND);
-    } else {
-        #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-            std::cout << "INFO: " << *num_devices << " EdgeTPU(s) found" << std::endl;
-        #endif
-    }
-    
-    return devices;
-}
-
-Image *LoadInputImageOrDie(std::string filename) {
-    std::string ext = util::GetFileExtension(filename);
-    if (ext != "bmp") {
-        std::cerr << "ERROR: Invalid input image extension `" << ext << "`" << std::endl;
-        exit(ERROR_LOAD_INPUT_FAILED);
-    }
-
-    Image *img = new Image;
-
-    img->data = util::ReadBmpImage(filename.c_str(), &img->width, &img->height, &img->channels);
-    if (!img->data) {
-        std::cerr << "ERROR: Could not read image from `" << filename << "`" << std::endl;
-        exit(ERROR_LOAD_INPUT_FAILED);
-    }
-
-    img->size = img->width * img->height * img->channels * sizeof(uint8_t);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout   << "INFO: Dimensions of input image: "
-                    << "(" << img->width << ", " << img->height << ", " << img->channels << ")"
-                    << std::endl;
-    #endif
-
-    return img;
-}
-
-std::unique_ptr<tflite::FlatBufferModel> LoadModelOrDie(std::string filename) {
-    using tflite::FlatBufferModel;
-    std::unique_ptr<FlatBufferModel> model = FlatBufferModel::BuildFromFile(filename.c_str());
-
-    if (!model) {
-        std::cerr << "ERROR: Could not read model from `" << filename << "`" << std::endl;
-        exit(ERROR_LOAD_MODEL_FAILED);
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Model file loaded successfully" << std::endl;
-    #endif
-
-    return model;
-}
-
-std::unique_ptr<tflite::Interpreter> CreateInterpreterOrDie(tflite::FlatBufferModel *model,
-                                                            edgetpu_device &device) {
-    // Create TFLite interpreter
-    tflite::ops::builtin::BuiltinOpResolver resolver;
-    std::unique_ptr<tflite::Interpreter> interpreter;
-    if (tflite::InterpreterBuilder(*model, resolver)(&interpreter) != kTfLiteOk) {
-        std::cerr << "ERROR: Could not create interpreter" << std::endl;
-        exit(ERROR_CREATE_INTERPRETER_FAILED);
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Interpreter created successfully" << std::endl;
-    #endif
-
-    // Create Edge TPU delegate
-    TfLiteDelegate *delegate = edgetpu_create_delegate(device.type, device.path, nullptr, 0);
-    if (!delegate) {
-        std::cerr << "ERROR: Could not create Edge TPU delegate" << std::endl;
-        exit(ERROR_CREATE_EDGETPU_DELEGATE_FAILED);
-    }
-
-    interpreter->ModifyGraphWithDelegate(delegate);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Edge TPU delegate created successfully" << std::endl;
-    #endif
-
-    // Allocate interpreter tensors
-    if (interpreter->AllocateTensors() != kTfLiteOk) {
-        std::cerr << "ERROR: Could not allocate interpreter tensors" << std::endl;
-        exit(ERROR_ALLOCATE_TENSORS_FAILED);
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Interpreter tensors allocated successfully" << std::endl;
-    #endif
-
-    return interpreter;
-}
-
-void SetInterpreterInputOrDie(tflite::Interpreter *interpreter, Image *img) {
-    const TfLiteTensor* input_tensor = interpreter->input_tensor(0);
-
-    if (input_tensor->type != kTfLiteUInt8) {
-        std::cerr << "ERROR: Input tensor data type must be UINT8" << std::endl;
-        exit(ERROR_SET_INTERPRETER_INPUT_FAILED);
-    }
-
-    if (input_tensor->dims->data[0] != 1            ||
-        input_tensor->dims->data[1] != img->height  ||
-        input_tensor->dims->data[2] != img->width   ||
-        input_tensor->dims->data[3] != img->channels) {
-        std::cerr << "ERROR: Input tensor shape does not match input image" << std::endl;
-        exit(ERROR_SET_INTERPRETER_INPUT_FAILED);
-    }
-
-    std::memcpy(interpreter->typed_input_tensor<uint8_t>(0), img->data, img->size);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Interpreter input set successfully" << std::endl;
-    #endif
-}
-
-const TfLiteTensor *InvokeInterpreterOrDie(tflite::Interpreter *interpreter) {
-    if (interpreter->Invoke() != kTfLiteOk) {
-        std::cerr << "ERROR: Could not invoke interpreter" << std::endl;
-        exit(ERROR_INVOKE_INTERPRETER_FAILED);
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Interpreter execution completed successfully" << std::endl;
-    #endif
-
-    // Get output tensor
-    const TfLiteTensor *out_tensor = interpreter->output_tensor(0);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
-        size_t out_vals_count = out_tensor->bytes / sizeof(uint8_t);
-        TfLiteIntArray *out_dims = out_tensor->dims;
-        std::cout << "DEBUG: Output tensor has " << out_vals_count << " values (";
-        for (int i = 0; i < out_dims->size; i++) 
-            std::cout << out_dims->data[i] << (i+1 < out_dims->size ? ", " : ")");
-        std::cout << std::endl;
-    #endif
-
-    return out_tensor;
-}
-
-void SaveGoldenOutputOrDie(const TfLiteTensor *out_tensor, std::string golden_filename) {
-    std::ofstream golden_file(golden_filename, std::ios::binary|std::ios::out);
-    if (!golden_file) {
-        std::cerr << "ERROR: Could not create golden output file" << std::endl;
-        exit(ERROR_SAVE_GOLDEN_FAILED);
-    }
-
-    TfLiteIntArray *out_dims = out_tensor->dims;
-
-    // Write output data dimensions size
-    golden_file.write((char*)&out_dims->size, sizeof(int));
-
-    // Write output data dimensions
-    golden_file.write((char*)out_dims->data, out_dims->size*sizeof(int));
-
-    // Write output data size
-    golden_file.write((char*)&out_tensor->bytes, sizeof(size_t));
-
-    // Write output data
-    const uint8_t *out_data = reinterpret_cast<const uint8_t*>(out_tensor->data.data);
-    golden_file.write((char*)out_data, out_tensor->bytes);
-
-    if (golden_file.bad()) {
-        std::cerr << "ERROR: Could not write golden output to file" << std::endl;
-        exit(ERROR_SAVE_GOLDEN_FAILED);
-    }
-
-    golden_file.close();
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
-        std::cout << "INFO: Golden output saved to `" << golden_filename << "`" << std::endl;
-    #endif
-}
-
-int CheckOutputAgainstGoldenOrDie(const TfLiteTensor *out_tensor, std::string golden_filename) {
-    std::ifstream golden_file(golden_filename, std::ios::binary);
-    if (!golden_file) {
-        std::cerr << "ERROR: Could not open golden output file `" + golden_filename + "`" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    // Read output data dimensions size
-    int g_out_dims_size;
-    golden_file.read((char*)&g_out_dims_size, sizeof(int));
-    
-    if (!golden_file || g_out_dims_size <= 0) {
-        std::cerr << "ERROR: Failed reading golden output file `" + golden_filename + "`" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    // Read output data dimensions
-    int *g_out_dims = new int[g_out_dims_size];
-    golden_file.read((char*)g_out_dims, g_out_dims_size*sizeof(int));
-
-    if (!golden_file || !g_out_dims) {
-        std::cerr << "ERROR: Failed reading golden output file `" + golden_filename + "`" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    // Read output data size
-    size_t g_out_bytes;
-    golden_file.read((char*)&g_out_bytes, sizeof(size_t));
-
-    if (!golden_file || g_out_bytes <= 0) {
-        std::cerr << "ERROR: Failed reading golden output file `" + golden_filename + "`" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    // Read output data
-    uint8_t *g_out_data = new uint8_t[g_out_bytes];
-    golden_file.read((char*)g_out_data, g_out_bytes);
-
-    if (!golden_file || !g_out_data) {
-        std::cerr << "ERROR: Failed reading golden output file `" + golden_filename + "`" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
-        std::cout << "DEBUG: Data from golden file was successfully read" << std:: endl;
-        std::cout << "  - Output data dimensions: ("; 
-        for (int i = 0; i < g_out_dims_size; i++) 
-            std::cout << g_out_dims[i] << (i+1 < g_out_dims_size ? ", " : ")");
-        std::cout << std::endl;
-    #endif
-
-    if (out_tensor->dims->size != g_out_dims_size ||
-        out_tensor->bytes != g_out_bytes) {
-        std::cerr << "ERROR: Golden output dimensions don't match interpreter output" << std::endl;
-        exit(ERROR_CHECK_OUTPUT_FAILED);
-    }
-
-    for (int i = 0; i < g_out_dims_size; i++) {
-        if (out_tensor->dims->data[i] != g_out_dims[i]) {
-            std::cerr << "ERROR: Golden output dimensions don't match interpreter output" << std::endl;
-            exit(ERROR_CHECK_OUTPUT_FAILED);
-        }
-    }
-
-    const uint8_t *out_data = reinterpret_cast<const uint8_t*>(out_tensor->data.data);
-    int errors = 0;
-    for (int i = 0; i < g_out_bytes; i++) {
-        if (out_data[i] != g_out_data[i])
-            errors++;
-    }
-
-    golden_file.close();
-    delete g_out_dims;
-    delete g_out_data;
-
-    return errors;
-}
-
 void FreeImage(Image *img) {
     delete img->data;
     delete img;
+}
+
+void LogErrorAndExit(std::string err_msg, int exit_code) {
+    std::cerr << err_msg << std::endl;
+    log_error_detail((char*)err_msg.c_str());
+    exit(exit_code);
 }
 
 void InitLogFileOrDie(std::string model_filename, std::string img_filename, std::string golden_filename) {
@@ -498,6 +246,322 @@ void InitLogFileOrDie(std::string model_filename, std::string img_filename, std:
     #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
         std::cout << "INFO: Log file is `" << get_log_file_name() << "`" << std::endl;
     #endif
+}
+
+std::unique_ptr<edgetpu_device, decltype(&edgetpu_free_devices)> GetEdgeTPUDevicesOrDie(size_t *num_devices) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif 
+
+    std::unique_ptr<edgetpu_device, decltype(&edgetpu_free_devices)> devices(
+        edgetpu_list_devices(num_devices), &edgetpu_free_devices);
+
+    if (*num_devices == 0) {
+        LogErrorAndExit("ERROR: No connected TPU found", ERROR_NO_TPU_FOUND);
+    } else {
+        #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+            std::cout << "INFO: " << *num_devices << " EdgeTPU(s) found" << std::endl;
+        #endif
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Find TPU devices: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
+        std::cout << "DEBUG: Edge TPU device 0" << std::endl;
+        std::cout << "  - Type: " << device.type << " (0: PCI, 1: USB)" << std::endl;
+        std::cout << "  - Path: " << device.path << std::endl;
+    #endif 
+    
+    return devices;
+}
+
+Image *LoadInputImageOrDie(std::string filename) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+    
+    std::string ext = util::GetFileExtension(filename);
+    if (ext != "bmp") {
+        LogErrorAndExit("ERROR: Invalid input image extension `" + ext + "`", ERROR_LOAD_INPUT_FAILED);
+    }
+
+    Image *img = new Image;
+
+    img->data = util::ReadBmpImage(filename.c_str(), &img->width, &img->height, &img->channels);
+    if (!img->data) {
+        LogErrorAndExit("ERROR: Could not read image from `" + filename + "`", ERROR_LOAD_INPUT_FAILED);
+    }
+
+    img->size = img->width * img->height * img->channels * sizeof(uint8_t);
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout   << "INFO: Dimensions of input image: "
+                    << "(" << img->width << ", " << img->height << ", " << img->channels << ")"
+                    << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Load input image: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif  
+
+    return img;
+}
+
+std::unique_ptr<tflite::FlatBufferModel> LoadModelOrDie(std::string filename) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    using tflite::FlatBufferModel;
+    std::unique_ptr<FlatBufferModel> model = FlatBufferModel::BuildFromFile(filename.c_str());
+
+    if (!model) {
+        LogErrorAndExit("ERROR: Could not read model from `" + filename + "`", ERROR_LOAD_MODEL_FAILED);
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Model file loaded successfully" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Load model: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif 
+
+    return model;
+}
+
+std::unique_ptr<tflite::Interpreter> CreateInterpreterOrDie(tflite::FlatBufferModel *model,
+                                                            edgetpu_device &device) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    // Create TFLite interpreter
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    std::unique_ptr<tflite::Interpreter> interpreter;
+    if (tflite::InterpreterBuilder(*model, resolver)(&interpreter) != kTfLiteOk) {
+        LogErrorAndExit("ERROR: Could not create interpreter", ERROR_CREATE_INTERPRETER_FAILED);
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Interpreter created successfully" << std::endl;
+    #endif
+
+    // Create Edge TPU delegate
+    TfLiteDelegate *delegate = edgetpu_create_delegate(device.type, device.path, nullptr, 0);
+    if (!delegate) {
+        LogErrorAndExit("ERROR: Could not create Edge TPU delegate", ERROR_CREATE_EDGETPU_DELEGATE_FAILED);
+    }
+
+    interpreter->ModifyGraphWithDelegate(delegate);
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Edge TPU delegate created successfully" << std::endl;
+    #endif
+
+    // Allocate interpreter tensors
+    if (interpreter->AllocateTensors() != kTfLiteOk) {
+        LogErrorAndExit("ERROR: Could not allocate interpreter tensors", ERROR_ALLOCATE_TENSORS_FAILED);
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Interpreter tensors allocated successfully" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Create interpreter: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif
+
+    return interpreter;
+}
+
+void SetInterpreterInputOrDie(tflite::Interpreter *interpreter, Image *img) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    const TfLiteTensor* input_tensor = interpreter->input_tensor(0);
+
+    if (input_tensor->type != kTfLiteUInt8) {
+        LogErrorAndExit("ERROR: Input tensor data type must be UINT8", ERROR_SET_INTERPRETER_INPUT_FAILED);
+    }
+
+    if (input_tensor->dims->data[0] != 1            ||
+        input_tensor->dims->data[1] != img->height  ||
+        input_tensor->dims->data[2] != img->width   ||
+        input_tensor->dims->data[3] != img->channels) {
+            LogErrorAndExit("ERROR: Input tensor shape does not match input image", ERROR_SET_INTERPRETER_INPUT_FAILED);
+    }
+
+    std::memcpy(interpreter->typed_input_tensor<uint8_t>(0), img->data, img->size);
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Interpreter input set successfully" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Set interpreter input: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif  
+}
+
+const TfLiteTensor *InvokeInterpreterOrDie(tflite::Interpreter *interpreter) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    if (interpreter->Invoke() != kTfLiteOk) {
+        LogErrorAndExit("ERROR: Could not invoke interpreter", ERROR_INVOKE_INTERPRETER_FAILED);
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Interpreter execution completed successfully" << std::endl;
+    #endif
+
+    // Get output tensor
+    const TfLiteTensor *out_tensor = interpreter->output_tensor(0);
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Run interpreter: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
+        size_t out_vals_count = out_tensor->bytes / sizeof(uint8_t);
+        TfLiteIntArray *out_dims = out_tensor->dims;
+        std::cout << "DEBUG: Output tensor has " << out_vals_count << " values (";
+        for (int i = 0; i < out_dims->size; i++) 
+            std::cout << out_dims->data[i] << (i+1 < out_dims->size ? ", " : ")");
+        std::cout << std::endl;
+    #endif
+
+    return out_tensor;
+}
+
+void SaveGoldenOutputOrDie(const TfLiteTensor *out_tensor, std::string golden_filename) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    std::ofstream golden_file(golden_filename, std::ios::binary|std::ios::out);
+    if (!golden_file) {
+        LogErrorAndExit("ERROR: Could not create golden output file", ERROR_SAVE_GOLDEN_FAILED);
+    }
+
+    TfLiteIntArray *out_dims = out_tensor->dims;
+
+    // Write output data dimensions size
+    golden_file.write((char*)&out_dims->size, sizeof(int));
+
+    // Write output data dimensions
+    golden_file.write((char*)out_dims->data, out_dims->size*sizeof(int));
+
+    // Write output data size
+    golden_file.write((char*)&out_tensor->bytes, sizeof(size_t));
+
+    // Write output data
+    const uint8_t *out_data = reinterpret_cast<const uint8_t*>(out_tensor->data.data);
+    golden_file.write((char*)out_data, out_tensor->bytes);
+
+    if (golden_file.bad()) {
+        LogErrorAndExit("ERROR: Could not write golden output to file", ERROR_SAVE_GOLDEN_FAILED);
+    }
+
+    golden_file.close();
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Golden output saved to `" << golden_filename << "`" << std::endl;
+    #endif
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Save golden output: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif 
+}
+
+int CheckOutputAgainstGoldenOrDie(const TfLiteTensor *out_tensor, std::string golden_filename) {
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t0 = util::Now();
+    #endif
+
+    std::ifstream golden_file(golden_filename, std::ios::binary);
+    if (!golden_file) {
+        LogErrorAndExit("ERROR: Could not open golden output file `" + golden_filename + "`", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    // Read output data dimensions size
+    int g_out_dims_size;
+    golden_file.read((char*)&g_out_dims_size, sizeof(int));
+    
+    if (!golden_file || g_out_dims_size <= 0) {
+        LogErrorAndExit("ERROR: Failed reading golden output file `" + golden_filename + "`", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    // Read output data dimensions
+    int *g_out_dims = new int[g_out_dims_size];
+    golden_file.read((char*)g_out_dims, g_out_dims_size*sizeof(int));
+
+    if (!golden_file || !g_out_dims) {
+        LogErrorAndExit("ERROR: Failed reading golden output file `" + golden_filename + "`", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    // Read output data size
+    size_t g_out_bytes;
+    golden_file.read((char*)&g_out_bytes, sizeof(size_t));
+
+    if (!golden_file || g_out_bytes <= 0) {
+        LogErrorAndExit("ERROR: Failed reading golden output file `" + golden_filename + "`", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    // Read output data
+    uint8_t *g_out_data = new uint8_t[g_out_bytes];
+    golden_file.read((char*)g_out_data, g_out_bytes);
+
+    if (!golden_file || !g_out_data) {
+        LogErrorAndExit("ERROR: Failed reading golden output file `" + golden_filename + "`", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
+        std::cout << "DEBUG: Data from golden file was successfully read" << std:: endl;
+        std::cout << "  - Output data dimensions: ("; 
+        for (int i = 0; i < g_out_dims_size; i++) 
+            std::cout << g_out_dims[i] << (i+1 < g_out_dims_size ? ", " : ")");
+        std::cout << std::endl;
+    #endif
+
+    if (out_tensor->dims->size != g_out_dims_size || out_tensor->bytes != g_out_bytes) {
+        LogErrorAndExit("ERROR: Golden output dimensions don't match interpreter output", ERROR_CHECK_OUTPUT_FAILED);
+    }
+
+    for (int i = 0; i < g_out_dims_size; i++) {
+        if (out_tensor->dims->data[i] != g_out_dims[i]) {
+            LogErrorAndExit("ERROR: Golden output dimensions don't match interpreter output", ERROR_CHECK_OUTPUT_FAILED);
+        }
+    }
+
+    const uint8_t *out_data = reinterpret_cast<const uint8_t*>(out_tensor->data.data);
+    int errors = 0;
+    for (int i = 0; i < g_out_bytes; i++) {
+        if (out_data[i] != g_out_data[i])
+            errors++;
+    }
+
+    golden_file.close();
+    delete g_out_dims;
+    delete g_out_data;
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+        auto t1 = util::Now();
+        std::cout << "TIMING: Check output: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
+    #endif 
+
+    return errors;
 }
 
 int main(int argc, char *argv[]) {
@@ -521,66 +585,29 @@ int main(int argc, char *argv[]) {
         InitLogFileOrDie(model_filename, img_filename, golden_filename);
     }
 
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t0 = util::Now();
-    #endif  
-
     // Find TPU devices
     size_t num_devices = 0;
     auto devices = GetEdgeTPUDevicesOrDie(&num_devices);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t1 = util::Now();
-        std::cout << "TIMING: Find TPU devices: " << util::TimeDiffMs(t0, t1) << "ms" << std::endl;
-    #endif  
-
     edgetpu_device &device = devices.get()[0];
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_DEBUG
-        std::cout << "DEBUG: Edge TPU device 0" << std::endl;
-        std::cout << "  - Type: " << device.type << " (0: PCI, 1: USB)" << std::endl;
-        std::cout << "  - Path: " << device.path << std::endl;
-    #endif 
 
     // Load input image
     Image *img = LoadInputImageOrDie(img_filename);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t2 = util::Now();
-        std::cout << "TIMING: Load input image: " << util::TimeDiffMs(t1, t2) << "ms" << std::endl;
-    #endif  
-
     // Load model
     std::unique_ptr<tflite::FlatBufferModel> model = LoadModelOrDie(model_filename);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t3 = util::Now();
-        std::cout << "TIMING: Load model: " << util::TimeDiffMs(t2, t3) << "ms" << std::endl;
-    #endif  
-
     // Create interpreter
     std::unique_ptr<tflite::Interpreter> interpreter = CreateInterpreterOrDie(model.get(), device);
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t4 = util::Now();
-        std::cout << "TIMING: Create interpreter: " << util::TimeDiffMs(t3, t4) << "ms" << std::endl;
-    #endif  
     
     long total_errors = 0;
 
     for (int i = 0; i < iterations; i++) {
-        #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-            auto t4 = util::Now();
+        #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
             std::cout << "INFO: Iteration " << i << std::endl;
         #endif
 
         // Set interpreter input
         SetInterpreterInputOrDie(interpreter.get(), img);
-
-        #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-            auto t5 = util::Now();
-            std::cout << "TIMING: Set interpreter input: " << util::TimeDiffMs(t4, t5) << "ms" << std::endl;
-        #endif  
         
         if (save_golden) {
             // Run interpreter
@@ -597,11 +624,6 @@ int main(int argc, char *argv[]) {
             const TfLiteTensor *out_tensor = InvokeInterpreterOrDie(interpreter.get());
             end_iteration();
 
-            #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-                auto t6 = util::Now();
-                std::cout << "TIMING: Run interpreter: " << util::TimeDiffMs(t5, t6) << "ms" << std::endl;
-            #endif
-
             // Check output
             int errors = CheckOutputAgainstGoldenOrDie(out_tensor, golden_filename);
             total_errors += errors;
@@ -612,15 +634,12 @@ int main(int argc, char *argv[]) {
             } else {
                 std::cout << "INFO: Output matches golden output (`" << golden_filename << "`)" << std::endl;
             }
-
-            #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-                auto t7 = util::Now();
-                std::cout << "TIMING: Check output: " << util::TimeDiffMs(t6, t7) << "ms" << std::endl;
-            #endif 
         }
     }
 
-    if (!save_golden) end_log_file();
+    if (!save_golden) {
+        end_log_file();
+    }
 
     FreeImage(img);
 

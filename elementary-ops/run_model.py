@@ -11,9 +11,14 @@ from pathlib import Path
 from pycoral.adapters import common
 
 import sys
+# import util
 sys.path.insert(1, './src')
 import util
 from util import Operation, Plataform
+
+# import _log_helper
+sys.path.insert(0, './include/log_helper_swig_wraper/')
+import _log_helper as lh
 
 GOLDEN_DIR = f"{Path(__file__).parent}/golden"
 
@@ -75,8 +80,8 @@ def save_output_golden(output, model_file):
 def check_output_against_golden(output, golden_file):    
     if os.path.isfile(golden_file):
         golden = np.load(golden_file)
-        match = np.array_equal(output, golden)
-        return match
+        errors = np.sum(output != golden)
+        return errors
     else:
         raise FileNotFoundError
 
@@ -88,6 +93,8 @@ def main():
                         help='Path to model file (.tflite)')
     parser.add_argument('-G', '--golden', required=False, default=None,
                         help='Path to golden output file (.npy)')
+    parser.add_argument('--iterations', required=False, default=10,
+                        help='Number of iterations')
     parser.add_argument('--save-golden', default=False, action='store_true',
                         help='Whether the output should be saved to a binary file in .npy format or not')
     parser.add_argument('--save-image', default=False, action='store_true',
@@ -97,9 +104,19 @@ def main():
     model_file = args.model
     input_image_file = args.input
     golden_file = args.golden
+    iterations = int(args.iterations)
 
+    dft_golden_file = get_output_golden_filename(model_file)
     plataform = util.get_plataform_from_model_name(model_file)
     operation = util.get_op_from_model_name(model_file)
+
+    # Setup log helper
+    benchmarkName = "CoralConv2d"
+    benchmarkInfo = f"model_file: {model_file} input_file: {input_file} dft_golden_file: {dft_golden_file} iterations: {iterations}"
+    lh.start_log_file(benchmarkName, benchmarkInfo)
+    lh.set_max_errors_iter(500)
+    lh.set_iter_interval_print(1)
+    print(f"Log file is: {lh.get_log_file_name()}")
 
     t0 = time()
     interpreter = create_interpreter(model_file, plataform)
@@ -107,35 +124,41 @@ def main():
     t1 = time()
     print(f"Create interpreter: {t1 - t0}s")
 
-    set_interpreter_intput(interpreter, input_image_file, operation)
+    for i in range(iterations):
+        t1 = time()
+        set_interpreter_intput(interpreter, input_image_file, operation)
 
-    t2 = time()
-    print(f"Load input: {t2 - t1}s")
+        t2 = time()
+        print(f"Load input: {t2 - t1}s")
 
-    interpreter.invoke()
+        lh.start_iteration()
+        interpreter.invoke()
+        lh.end_iteration()
 
-    t3 = time()
-    print(f"Run interpreter: {t3 - t2}s")
+        t3 = time()
+        print(f"Run interpreter: {t3 - t2}s")
 
-    output = get_output_array(interpreter)
+        output = get_output_array(interpreter)
 
-    t4 = time()
-    print(f"Get output: {t4 - t3}s")
+        t4 = time()
+        print(f"Get output: {t4 - t3}s")
 
-    if golden_file is None:
-        try:
-            dft_golden_file = get_output_golden_filename(model_file)
-            match = check_output_against_golden(output, dft_golden_file)
-            t5 = time()
-            print(f"Check output: {t5 - t4}s {'(ERROR)' if not match else ''}")
-        except: pass
-    else:
-        try:
-            match = check_output_against_golden(output, golden_file)
-            t5 = time()
-            print(f"Check output: {t5 - t4}s {'(ERROR)' if not match else ''}")
-        except FileNotFoundError:
-            print(f"Could not open golden file `{golden_file}`")
+        if golden_file is None:
+            try:
+                errors = check_output_against_golden(output, dft_golden_file)
+                t5 = time()
+                print(f"Check output: {t5 - t4}s - {errors} error(s)")
+                lh.log_error_count(int(errors))
+            except: pass
+        else:
+            try:
+                errors = check_output_against_golden(output, golden_file)
+                t5 = time()
+                print(f"Check output: {t5 - t4}s - {errors} error(s)")
+                lh.log_error_count(int(errors))
+            except FileNotFoundError:
+                print(f"Could not open golden file `{golden_file}`")
+                lh.log_error_count(f"Could not open golden file `{golden_file}`")
 
     if args.save_image:
         save_output_image(output, model_file)
