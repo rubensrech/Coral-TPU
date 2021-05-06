@@ -1,0 +1,4 @@
+[
+    {"killcmd": "killall -9 run_model", "exec": "sudo  /home/carol/Coral-TPU/elementary-ops/run_model  /home/carol/Coral-TPU/elementary-ops/models/conv_2d_1_1000_1000_1_40_40_1_1_quant_edgetpu.tflite  /home/carol/Coral-TPU/elementary-ops/inputs/rand-conv_2d_1_1000_1000_1_40_40_1_1.bmp  /home/carol/Coral-TPU/elementary-ops/golden/golden_rand_conv_2d_1_1000_1000_1_40_40_1_1_quant_edgetpu.out  --iterations 1000000000"},
+    {"killcmd": "killall -9 run_model", "exec": "sudo  /home/carol/Coral-TPU/elementary-ops/run_model  /home/carol/Coral-TPU/elementary-ops/models/depthwise_conv_2d_1_1000_1000_3_20_20_3_1_quant_edgetpu.tflite  /home/carol/Coral-TPU/elementary-ops/inputs/rand-depthwise_conv_2d_1_1000_1000_3_20_20_3_1.bmp  /home/carol/Coral-TPU/elementary-ops/golden/golden_rand_depthwise_conv_2d_1_1000_1000_3_20_20_3_1_quant_edgetpu.out  --iterations 100000000"}
+]
