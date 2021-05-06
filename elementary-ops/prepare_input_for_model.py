@@ -30,7 +30,7 @@ def get_output_name(model_file, out_ext, image_file=None):
 
 def generate_from_input_image(model_file, image_file, output_size, op, out_ext):
     img = Image.open(image_file)
-    img = img.resize(output_size)
+    img = img.resize(output_size[0:2])
 
     if op == Operation.Conv2d:
         img = img.convert('L')
@@ -75,7 +75,7 @@ def main():
     op = util.get_op_from_model_name(model_file)
     dims = util.get_dims_from_model_name(model_file)
 
-    output_size = dims[1:3]
+    output_size = dims[1:4]
     output_ext = "npy" if npy_out else "bmp"
 
     if image_file is not None:
