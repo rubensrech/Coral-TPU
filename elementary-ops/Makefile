@@ -18,20 +18,25 @@
 # 6. Set the paths to the Edge TPU runtime, TensorFlow and TensorFlow Lite lib in
 # 	  `EDGETPU_RUNTIME_DIR`, `TENSORFLOW_DIR` and `TFLITE_AARCH64_LIB_DIR`
 
-# NONE: 0, TIMING: 1, INFO: 2, DEBUG 3
-LOGGING_LEVEL=1
+# NONE: 0, INFO: 1, TIMING: 2, DEBUG 3
+LOGGING_LEVEL=2
+MAX_ERRORS_PER_IT=500
+
+CC_FLAGS=-std=c++11 -Wno-write-strings
+CC_FLAGS+=-DLOGGING_LEVEL=$(LOGGING_LEVEL) -DMAX_ERRORS_PER_IT=$(MAX_ERRORS_PER_IT)
 
 EDGETPU_RUNTIME_DIR=$(CURDIR)/../edgetpu_runtime
 TENSORFLOW_DIR=$(CURDIR)/../tensorflow
 TFLITE_AARCH64_LIB_DIR=$(CURDIR)/../tflite-aarch64/lib
+LOG_HELPER_DIR=$(CURDIR)/include
 
-run_model: run_model.cpp
-	aarch64-linux-gnu-g++ -std=c++11 -o run_model run_model.cpp \
-		-DLOGGING_LEVEL=$(LOGGING_LEVEL) \
+run_model: run_model.cpp $(LOG_HELPER_DIR)/log_helper.c
+	aarch64-linux-gnu-g++ $^ -o $@ $(CC_FLAGS) \
 		-I$(EDGETPU_RUNTIME_DIR)/libedgetpu/ \
 		-L$(EDGETPU_RUNTIME_DIR)/libedgetpu/direct/aarch64/ \
 		-I$(TENSORFLOW_DIR) \
 		-I$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/downloads/flatbuffers/include \
+		-I$(LOG_HELPER_DIR) \
 		-L$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/gen/generic-aarch64_armv8-a/lib \
 		-L$(TFLITE_AARCH64_LIB_DIR) \
 		-ltensorflow-lite -l:libedgetpu.so.1.0 -lpthread -lm -ldl

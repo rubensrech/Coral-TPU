@@ -19,15 +19,23 @@
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 
+#include "log_helper.h"
+
 // Logging levels
 #define LOGGING_LEVEL_NONE      0
-#define LOGGING_LEVEL_TIMING    1
-#define LOGGING_LEVEL_INFO      2
+#define LOGGING_LEVEL_INFO      1
+#define LOGGING_LEVEL_TIMING    2
 #define LOGGING_LEVEL_DEBUG     3
 
 #ifndef LOGGING_LEVEL
 #define LOGGING_LEVEL           LOGGING_LEVEL_DEBUG
 #endif
+
+#ifndef MAX_ERRORS_PER_IT
+#define MAX_ERRORS_PER_IT       500
+#endif
+
+#define BENCHMARK_NAME          "Coral-Conv2d"
 
 // Exit codes
 #define OK_WITH_OUTPUT_ERRORS                   -1
@@ -42,6 +50,7 @@
 #define ERROR_INVOKE_INTERPRETER_FAILED         8
 #define ERROR_SAVE_GOLDEN_FAILED                9
 #define ERROR_CHECK_OUTPUT_FAILED               10
+#define ERROR_INIT_LOG_FILE                     11
 
 
 namespace util {
@@ -155,15 +164,15 @@ std::string GetFileExtension(std::string filename) {
     return filename.substr(filename.find_last_of(".") + 1);
 }
 
-std::string GetGoldenFilenameFromModelFilename(std::string model_filename) {    
-    auto slash_pos = model_filename.find_last_of("/");
-    std::string model_name = model_filename.substr(slash_pos+1);
-    
-    auto ext_pos = model_name.find_last_of(".");
-    model_name =  model_name.substr(0, ext_pos);
+std::string GetDftGoldenFilename(std::string model_filename, std::string img_filename) {    
+    std::string model_name = model_filename.substr(model_filename.find_last_of('/')+1);
+    model_name =  model_name.substr(0, model_name.find_last_of('.'));
+
+    std::string img_name = img_filename.substr(img_filename.find_last_of('/')+1);
+    img_name = img_name.substr(0, img_name.find_first_of('-'));
 
     std::string goldenDir = "golden/";
-    std::string golden_filename = goldenDir + "golden_" + model_name + ".out";
+    std::string golden_filename = goldenDir + "golden_" + img_name + "_" + model_name + ".out";
     return golden_filename;
 }
 
@@ -181,7 +190,7 @@ void DeleteArg(int argc, char **argv, int index) {
     argv[i] = 0;
 }
 
-bool GetBoolArg(int argc, char **argv, const char *arg, bool def) {
+int GetIntArg(int argc, char **argv, const char *arg, int def) {
     int i;
     for(i = 0; i < argc-1; ++i){
         if(!argv[i]) continue;
@@ -193,6 +202,10 @@ bool GetBoolArg(int argc, char **argv, const char *arg, bool def) {
         }
     }
     return def;
+}
+
+bool GetBoolArg(int argc, char **argv, const char *arg, bool def) {
+    return (bool)GetIntArg(argc, argv, arg, def);
 }
 
 } // namespace util
@@ -468,18 +481,45 @@ void FreeImage(Image *img) {
     delete img;
 }
 
+void InitLogFileOrDie(std::string model_filename, std::string img_filename, std::string golden_filename) {
+    char benchmarkName[30] = BENCHMARK_NAME;
+    char benchmarkInfo[300];
+    snprintf(benchmarkInfo, sizeof(benchmarkInfo), "model_file: %s, input_file: %s, golden_file: %s",
+             model_filename.c_str(), img_filename.c_str(), golden_filename.c_str());
+
+	if (start_log_file(benchmarkName, benchmarkInfo)) {
+		std::cerr << "ERROR: Could not initialize log file `" << std::endl;
+        exit(ERROR_INIT_LOG_FILE);
+	}
+
+    set_max_errors_iter(MAX_ERRORS_PER_IT);
+    set_iter_interval_print(1);
+
+    #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+        std::cout << "INFO: Log file is `" << get_log_file_name() << "`" << std::endl;
+    #endif
+}
+
 int main(int argc, char *argv[]) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <model_file> <image_file> [--save-golden 0*|1]" << std::endl;
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " <model_file> <image_file> <golden_file>"
+                    << " [--save-golden 0*|1] [--iterations <iterations=10>]" << std::endl;
         return 1;
     }
 
     // Arguments
+    // - Required
     const std::string model_filename = argv[1];
     const std::string img_filename = argv[2];
-    
+    const std::string golden_filename = argv[3];
+    // - Optional
     bool save_golden = util::GetBoolArg(argc, argv, "--save-golden", false);
-    std::string golden_filename = util::GetGoldenFilenameFromModelFilename(model_filename);
+    int iterations = util::GetIntArg(argc, argv, "--iterations", 10);
+
+    // Initialize log file
+    if (!save_golden) {
+        InitLogFileOrDie(model_filename, img_filename, golden_filename);
+    }
 
     #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
         auto t0 = util::Now();
@@ -526,43 +566,65 @@ int main(int argc, char *argv[]) {
         std::cout << "TIMING: Create interpreter: " << util::TimeDiffMs(t3, t4) << "ms" << std::endl;
     #endif  
     
-    // Set interpreter input
-    SetInterpreterInputOrDie(interpreter.get(), img);
+    long total_errors = 0;
 
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t5 = util::Now();
-        std::cout << "TIMING: Set interpreter input: " << util::TimeDiffMs(t4, t5) << "ms" << std::endl;
-    #endif  
+    for (int i = 0; i < iterations; i++) {
+        #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+            auto t4 = util::Now();
+            std::cout << "INFO: Iteration " << i << std::endl;
+        #endif
 
-    // Run interpreter
-    const TfLiteTensor *out_tensor = InvokeInterpreterOrDie(interpreter.get());
+        // Set interpreter input
+        SetInterpreterInputOrDie(interpreter.get(), img);
 
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t6 = util::Now();
-        std::cout << "TIMING: Run interpreter: " << util::TimeDiffMs(t5, t6) << "ms" << std::endl;
-    #endif  
+        #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+            auto t5 = util::Now();
+            std::cout << "TIMING: Set interpreter input: " << util::TimeDiffMs(t4, t5) << "ms" << std::endl;
+        #endif  
+        
+        if (save_golden) {
+            // Run interpreter
+            const TfLiteTensor *out_tensor = InvokeInterpreterOrDie(interpreter.get());
 
-    // Save golden output
-    if (save_golden) {
-        SaveGoldenOutputOrDie(out_tensor, golden_filename);
+            // Save golden output
+            std::string output_golden_file = util::GetDftGoldenFilename(model_filename, img_filename);
+            SaveGoldenOutputOrDie(out_tensor, output_golden_file);
+            std::cout << "INFO: Golden output saved to file `" << output_golden_file << "`" << std::endl;
+            break;
+        } else {
+            // Run interpreter
+            start_iteration();
+            const TfLiteTensor *out_tensor = InvokeInterpreterOrDie(interpreter.get());
+            end_iteration();
+
+            #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+                auto t6 = util::Now();
+                std::cout << "TIMING: Run interpreter: " << util::TimeDiffMs(t5, t6) << "ms" << std::endl;
+            #endif
+
+            // Check output
+            int errors = CheckOutputAgainstGoldenOrDie(out_tensor, golden_filename);
+            total_errors += errors;
+            log_error_count(errors);
+
+            if (errors > 0) {
+                std::cout << "INFO: " << errors << " error(s) found in the output" << std::endl;
+            } else {
+                std::cout << "INFO: Output matches golden output (`" << golden_filename << "`)" << std::endl;
+            }
+
+            #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
+                auto t7 = util::Now();
+                std::cout << "TIMING: Check output: " << util::TimeDiffMs(t6, t7) << "ms" << std::endl;
+            #endif 
+        }
     }
 
-    // Check output
-    int errors = CheckOutputAgainstGoldenOrDie(out_tensor, golden_filename);
-    if (errors > 0) {
-        std::cout << "INFO: " << errors << " error(s) found in the output" << std::endl;
-    } else {
-        std::cout << "INFO: Output matches golden output (`" << golden_filename << "`)" << std::endl;
-    }
-
-    #if LOGGING_LEVEL >= LOGGING_LEVEL_TIMING
-        auto t7 = util::Now();
-        std::cout << "TIMING: Check output: " << util::TimeDiffMs(t6, t7) << "ms" << std::endl;
-    #endif  
+    if (!save_golden) end_log_file();
 
     FreeImage(img);
 
-    if (errors > 0) {
+    if (total_errors > 0) {
         exit(OK_WITH_OUTPUT_ERRORS);
     } else {
         exit(OK);
