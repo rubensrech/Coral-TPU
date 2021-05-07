@@ -231,7 +231,7 @@ void LogErrorAndExit(std::string err_msg, int exit_code) {
 
 void InitLogFileOrDie(std::string model_filename, std::string img_filename, std::string golden_filename) {
     char benchmarkName[30] = BENCHMARK_NAME;
-    char benchmarkInfo[300];
+    char benchmarkInfo[500];
     snprintf(benchmarkInfo, sizeof(benchmarkInfo), "model_file: %s, input_file: %s, golden_file: %s",
              model_filename.c_str(), img_filename.c_str(), golden_filename.c_str());
 
