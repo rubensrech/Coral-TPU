@@ -10,6 +10,8 @@ sys.path.insert(1, './src')
 import util
 from util import Operation
 
+np.random.seed(0)
+
 INPUTS_DIR = f"{Path(__file__).parent}/inputs"
 
 def get_input_image_name(image_filename):
@@ -55,7 +57,8 @@ def generate_random_input(model_file, size, op, out_ext):
     elif out_ext == "npy":
         np.save(output_file, rand_input)
 
-    print(f'Random input saved to `{output_file}` with dimensions {size}')
+    zero_count = np.sum(rand_input == 0)
+    print(f'Random input saved to `{output_file}` with dimensions {size} and {zero_count} zero element(s)')
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
