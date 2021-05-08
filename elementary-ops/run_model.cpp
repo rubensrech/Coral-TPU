@@ -52,6 +52,7 @@
 #define ERROR_CHECK_OUTPUT_FAILED               10
 #define ERROR_INIT_LOG_FILE                     11
 
+long total_errors_count = 0;
 
 namespace util {
 
@@ -545,11 +546,28 @@ int CheckOutputAgainstGoldenOrDie(const TfLiteTensor *out_tensor, std::string go
         }
     }
 
+    int n = g_out_dims[0],
+        h = g_out_dims[1],
+        w = g_out_dims[2],
+        c = g_out_dims[3];
+
     const uint8_t *out_data = reinterpret_cast<const uint8_t*>(out_tensor->data.data);
     int errors = 0;
     for (int i = 0; i < g_out_bytes; i++) {
-        if (out_data[i] != g_out_data[i])
+        if (out_data[i] != g_out_data[i]) {
             errors++;
+            if (errors < MAX_ERRORS_PER_IT) {
+                char error_detail[100];
+                snprintf(error_detail, sizeof(error_detail), 
+                    "position: [%u, %u], result: %u, expected: %d",
+                    (int) floor(i / h), i % h, out_data[i], g_out_data[i]);
+                log_error_detail(error_detail);
+
+                #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
+                    std::cout << "INFO: Error detail: " << error_detail << std::endl;
+                #endif 
+            }
+        }
     }
 
     golden_file.close();
@@ -598,8 +616,6 @@ int main(int argc, char *argv[]) {
 
     // Create interpreter
     std::unique_ptr<tflite::Interpreter> interpreter = CreateInterpreterOrDie(model.get(), device);
-    
-    long total_errors = 0;
 
     for (int i = 0; i < iterations; i++) {
         #if LOGGING_LEVEL >= LOGGING_LEVEL_INFO
@@ -625,7 +641,7 @@ int main(int argc, char *argv[]) {
 
             // Check output
             int errors = CheckOutputAgainstGoldenOrDie(out_tensor, golden_filename);
-            total_errors += errors;
+            total_errors_count += errors;
             log_error_count(errors);
 
             if (errors > 0) {
@@ -642,7 +658,7 @@ int main(int argc, char *argv[]) {
 
     FreeImage(img);
 
-    if (total_errors > 0) {
+    if (total_errors_count > 0) {
         exit(OK_WITH_OUTPUT_ERRORS);
     } else {
         exit(OK);
