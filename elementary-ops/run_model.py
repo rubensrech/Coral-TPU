@@ -57,7 +57,7 @@ def get_input_tensor(interpreter):
 
 def get_output_array(interpreter):
     output_details = interpreter.get_output_details()
-    out_tensor = interpreter.get_tensor(output_details[0]["index"])
+    out_tensor = interpreter.tensor(output_details[0]["index"])()
     out_array = np.squeeze(out_tensor).astype(np.uint8)
     return out_array
 
