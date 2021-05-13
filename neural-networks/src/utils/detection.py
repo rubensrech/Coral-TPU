@@ -17,15 +17,20 @@ import numpy as np
 
 from src.utils import common
 
-Object = collections.namedtuple('Object', ['id', 'score', 'bbox'])
-"""Represents a detected object.
-  .. py:attribute:: id
-      The object's class id.
-  .. py:attribute:: score
-      The object's prediction score.
-  .. py:attribute:: bbox
-      A :obj:`BBox` object defining the object's location.
-"""
+class Object(collections.namedtuple('Object', ['id', 'score', 'bbox'])):
+    """Represents a detected object.
+    .. py:attribute:: id
+        The object's class id.
+    .. py:attribute:: score
+        The object's prediction score.
+    .. py:attribute:: bbox
+        A :obj:`BBox` object defining the object's location.
+    """
+    def print(self, labels={}):
+        print(labels.get(self.id, self.id))
+        print('  id:    ', self.id)
+        print('  score: ', self.score)
+        print('  bbox:  ', self.bbox)
 
 
 class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
@@ -148,6 +153,7 @@ class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
         area = intersection.area
         return area / (a.area + b.area - area)
 
+
 class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 'class_ids', 'scores', 'count'])):
     """Represents the raw output tensors of the interpreter.
         .. py:attribute:: boxes
@@ -162,18 +168,22 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
     __slots__ = ()
 
     def save_to_file(self, filename):
-        np.save(filename, self._asdict())
-    
+        common.save_tensors_to_file(self._asdict(), filename)
+
     @staticmethod
-    def from_file(filename):
-        data = np.load(filename, allow_pickle=True).item()
+    def from_data(data):
         return DetectionRawOutput(
             boxes=data['boxes'],
             class_ids=data['class_ids'],
             scores=data['scores'],
             count=data['count'])
 
-    def get_objects(self, input_size, img_scale=(1.,1.), threshold=-float('inf')):
+    @staticmethod
+    def from_file(filename):
+        data = common.load_tensors_from_file(filename)
+        return DetectionRawOutput.from_data(data)
+
+    def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf')):
         width, height = input_size
         img_scale_x, img_scale_y = img_scale
         sx, sy = width / img_scale_x, height / img_scale_y
@@ -181,19 +191,20 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
         def make_object(i):
             ymin, xmin, ymax, xmax = self.boxes[i]
             return Object(
-                id=self.class_ids[i],
+                id=int(self.class_ids[i]),
                 score=self.scores[i],
                 bbox=BBox(xmin, ymin, xmax, ymax).scale(sx, sy).map(int))
 
         return [make_object(i) for i in range(self.count) if self.scores[i] >= threshold]
-    
 
-def get_raw_output(interpreter):
+
+def get_detection_raw_output(interpreter):
     return DetectionRawOutput(
         boxes=common.output_tensor(interpreter, 0)[0],
         class_ids=common.output_tensor(interpreter, 1)[0],
         scores=common.output_tensor(interpreter, 2)[0],
         count=int(common.output_tensor(interpreter, 3)[0]))
 
+
 def get_objects(interpreter, img_scale=(1., 1.), threshold=-float('inf')):
-    return get_raw_output(interpreter).get_objects(common.input_size(interpreter), img_scale)
+    return get_detection_raw_output(interpreter).get_objects(common.input_size(interpreter), img_scale)

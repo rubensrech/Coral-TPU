@@ -18,6 +18,8 @@ import re
 import numpy as np
 from pathlib import Path
 
+from src.utils import detection
+
 
 def output_tensor(interpreter, i):
     """Gets a model's ith output tensor.
@@ -125,7 +127,44 @@ INPUTS_DIR = f"{INSTALL_DIR}/inputs"
 MODELS_DIR = f"{INSTALL_DIR}/models"
 LABELS_DIR = f"{INSTALL_DIR}/labels"
 
-def get_dft_golden_filename(model_file, image_file):
+def get_model_file_from_name(model_name):
+    return f"{MODELS_DIR}/{model_name}.tflite"
+
+def get_input_file_from_name(img_name, ext="jpg"):
+    return f"{INPUTS_DIR}/{img_name}.{ext}"
+
+def get_dft_golden_filename(model_file: str, image_file: str) -> str:
     model_name = Path(model_file).stem
     image_name = Path(image_file).stem
     return f"{GOLDEN_DIR}/{model_name}--{image_name}.npy"
+
+def parse_golden_filename(golden_file: str) -> tuple:
+    golden_name = Path(golden_file).stem
+    parts = golden_name.split("--")
+    model_name = parts[0]
+    image_name = parts[1]
+    return model_name, image_name
+
+
+def save_tensors_to_file(tensors_dict: dict, filename: str):
+    np.save(filename, tensors_dict)
+
+def load_tensors_from_file(filename: str) -> dict:
+    return np.load(filename, allow_pickle=True).item()
+
+
+def get_raw_output(interpreter, coral_out_tensors_idxs=[]) -> dict:
+    det_out = detection.get_detection_raw_output(interpreter)._asdict()
+    coral_out = { tensorIdx: interpreter.tensor(tensorIdx)() for tensorIdx in coral_out_tensors_idxs }
+    return { **det_out, **coral_out }
+
+
+def create_interpreter(model_file, cpu=False):
+    if cpu:
+        from tensorflow import lite as tflite
+        interpreter = tflite.Interpreter(model_file)
+    else:
+        from pycoral.utils.edgetpu import make_interpreter        
+        interpreter = make_interpreter(model_file)
+
+    return interpreter
