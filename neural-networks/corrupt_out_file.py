@@ -1,8 +1,14 @@
+import os
 import numpy as np
 import argparse
 from src.utils import common
 
-def patch_out_file(out_file, error_descriptors):
+ORIG_SUFFIX = ".orig"
+
+def corrupt_out_file(out_file, error_descriptors):
+    # Save original file
+    os.system(f'cp {out_file} {out_file + ORIG_SUFFIX}')
+
     out_data = common.load_tensors_from_file(out_file)
 
     for err in error_descriptors:
@@ -14,7 +20,7 @@ def patch_out_file(out_file, error_descriptors):
             randVal = np.random.randint(0, 255)
             prevVal = out_data[err.get('tensor')]
             out_data[err.get('tensor')] = randVal
-            print(f"Patch (tensor: {err.get('tensor')}, position: 0, prevVal: {prevVal}, newVal: {randVal})")
+            print(f"Corruption (tensor: {err.get('tensor')}, position: 0, prevVal: {prevVal}, newVal: {randVal})")
         else:
             for i in range(count):
                 maxLinIdx = np.product(out_data[tensorName].shape)
@@ -23,22 +29,30 @@ def patch_out_file(out_file, error_descriptors):
                 prevVal = out_data[tensorName].ravel()[randLinPos]
                 out_data[tensorName].ravel()[randLinPos] = randVal
                 position = np.unravel_index(randLinPos, out_data[tensorName].shape)
-                print(f"Patch (tensor: {err.get('tensor')}, position: {position}, prevVal: {prevVal}, newVal: {randVal})")
+                print(f"Corruption (tensor: {err.get('tensor')}, position: {position}, prevVal: {prevVal}, newVal: {randVal})")
 
     np.save(out_file, out_data)
 
+def revert(out_file):
+    orig_file = out_file + ORIG_SUFFIX
+    os.system(f'cp {orig_file} {out_file}', )
+    os.unlink(orig_file)
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('out_file', help='Path to file to be patched')
+    parser.add_argument('out_file', help='Path to the file to be corrupted')
+    parser.add_argument('-R', '--revert', action='store_true', help='Revert back to original file')
     args = parser.parse_args()
 
-    patch_out_file(args.out_file, [
-        { 'tensor': 'boxes', 'count': 5 },
-        { 'tensor': 'class_ids', 'count': 3 },
-        { 'tensor': 'scores', 'count': 1 },
-        { 'tensor': 2, 'count': 10 },
-        { 'tensor': 'count', 'count': 1 },
-    ])
+    if args.revert:
+        revert(args.out_file)
+    else:
+        corrupt_out_file(args.out_file, [
+            { 'tensor': 'boxes', 'count': 1 },
+            # { 'tensor': 'class_ids', 'count': 1 },
+            # { 'tensor': 'scores', 'count': 1 },
+            # { 'tensor': 'count', 'count': 1 },
+        ])
 
 if __name__ == '__main__':
     main()
