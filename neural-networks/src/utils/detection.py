@@ -183,7 +183,8 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
         data = common.load_tensors_from_file(filename)
         return DetectionRawOutput.from_data(data)
 
-    def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf')):
+    def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None):
+        count = nobjs if not nobjs is None else self.count
         width, height = input_size
         img_scale_x, img_scale_y = img_scale
         sx, sy = width / img_scale_x, height / img_scale_y
@@ -195,7 +196,7 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
                 score=self.scores[i],
                 bbox=BBox(xmin, ymin, xmax, ymax).scale(sx, sy).map(int))
 
-        return [make_object(i) for i in range(self.count) if self.scores[i] >= threshold]
+        return [make_object(i) for i in range(count) if self.scores[i] >= threshold]
 
 
 def get_detection_raw_output(interpreter):

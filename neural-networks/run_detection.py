@@ -13,8 +13,13 @@ Logger.setLevel(Logger.Level.DEBUG)
 from src.utils import common
 
 MAX_ERR_PER_IT = 500
+INCLUDE_CORAL_OUT_IN_SDC_FILES = False
 
 # Auxiliary functions
+
+def save_output_to_file(raw_out_dict, filename, model_input_size, input_image_scale):
+    data = { **raw_out_dict, 'input_image_scale': input_image_scale, 'model_input_size': model_input_size }
+    common.save_tensors_to_file(data, filename)
 
 # Main functions
 
@@ -60,13 +65,15 @@ def save_golden_output(interpreter, model_file, image_file, img_scale, coral_out
 
     golden_file = common.get_dft_golden_filename(model_file, image_file)
     raw_out = common.get_raw_output(interpreter, coral_out_tensors)
-    data = { **raw_out, 'input_image_scale': img_scale, 'model_input_size': common.input_size(interpreter) }
-    common.save_tensors_to_file(data, golden_file)
+    model_in_size = common.input_size(interpreter)
+    save_output_to_file(raw_out, golden_file, model_in_size, img_scale)
 
     t1 = time.perf_counter()
 
     Logger.info(f"Golden output saved to file `{golden_file}`")
     Logger.timing("Save golden output", t1 - t0)
+
+    return golden_file
 
 def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
     t0 = time.perf_counter()
@@ -74,9 +81,6 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
     try:
         gold_out = common.load_tensors_from_file(golden_file)
         curr_out = common.get_raw_output(interpreter, coral_out_tensors)
-
-        if len(curr_out) != len(gold_out):
-            raise Exception("Invalid golden file for current execution")
     except IOError:
         raise Exception("Could not open golden file")
 
@@ -123,11 +127,27 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
             
     return out_total_errs_count
 
+def save_sdc_output(interpreter, model_file, img_file, img_scale, coral_out_tensors=[]):
+    t0 = time.perf_counter()
+
+    sdc_out_file = common.get_dft_sdc_out_filename(model_file, img_file)
+    raw_out = common.get_raw_output(interpreter, coral_out_tensors if INCLUDE_CORAL_OUT_IN_SDC_FILES else [])
+    model_in_size = common.input_size(interpreter)
+    save_output_to_file(raw_out, sdc_out_file, model_in_size, img_scale)
+
+    t1 = time.perf_counter()
+
+    Logger.info(f"SDC output saved to file `{sdc_out_file}`")
+    Logger.timing("Save SDC output", t1 - t0)
+
+    return sdc_out_file
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # Required
     parser.add_argument('-m', '--model', required=True, help='File path to .tflite file')
     parser.add_argument('-i', '--input', required=True, help='File path to list of images to be processed')
+    parser.add_argument('-t', '--coral-tensors', required=True, help='Tensor indexes of the output from Coral TPU (comma separated)')
     # Optionals
     parser.add_argument('--iterations', type=int, default=1, help='Number of times to run inference')
     parser.add_argument('--save-golden', action='store_true', default=False, help='Whether the output should be saved to a binary file in .npy format or not')
@@ -135,11 +155,11 @@ def main():
 
     model_file = args.model
     input_file = args.input
+    coral_out_tensors = list(map(int, args.coral_tensors.split(",")))
     iterations = args.iterations
     save_golden = args.save_golden
 
     cpu = not Path(model_file).stem.endswith('_edgetpu')
-    coral_out_tensors = [165, 174]
 
     interpreter = create_interpreter(model_file, cpu)
 
@@ -160,8 +180,13 @@ def main():
                 save_golden_output(interpreter, model_file, image_file, img_scale, coral_out_tensors)
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
-                check_output_against_golden(interpreter, coral_out_tensors, golden_file)
-                # TO-DO: if errors, save output 
+                errs_count = check_output_against_golden(interpreter, coral_out_tensors, golden_file)
+                if errs_count > 0:
+                    sdc_file = save_sdc_output(interpreter, model_file, image_file, img_scale, coral_out_tensors)
+                    Logger.info(f"SDC output saved to file `{sdc_file}`")
+
+                    Logger.error(f"SDC: {errs_count} error(s) detected")
+                    # LogHelper.log_error_count(errs_count)
 
         if save_golden:
             break

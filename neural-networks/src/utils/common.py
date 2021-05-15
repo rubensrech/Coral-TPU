@@ -15,6 +15,7 @@
 """Functions to work with any model."""
 
 import re
+import time
 import numpy as np
 from pathlib import Path
 
@@ -126,6 +127,7 @@ GOLDEN_DIR = f"{INSTALL_DIR}/golden"
 INPUTS_DIR = f"{INSTALL_DIR}/inputs"
 MODELS_DIR = f"{INSTALL_DIR}/models"
 LABELS_DIR = f"{INSTALL_DIR}/labels"
+OUTPUTS_DIR = f"{INSTALL_DIR}/outputs"
 
 def get_model_file_from_name(model_name):
     return f"{MODELS_DIR}/{model_name}.tflite"
@@ -133,10 +135,10 @@ def get_model_file_from_name(model_name):
 def get_input_file_from_name(img_name, ext="jpg"):
     return f"{INPUTS_DIR}/{img_name}.{ext}"
 
-def get_dft_golden_filename(model_file: str, image_file: str) -> str:
+def get_dft_golden_filename(model_file: str, image_file: str, ext="npy") -> str:
     model_name = Path(model_file).stem
     image_name = Path(image_file).stem
-    return f"{GOLDEN_DIR}/{model_name}--{image_name}.npy"
+    return f"{GOLDEN_DIR}/{model_name}--{image_name}.{ext}"
 
 def parse_golden_filename(golden_file: str) -> tuple:
     golden_name = Path(golden_file).stem
@@ -145,6 +147,22 @@ def parse_golden_filename(golden_file: str) -> tuple:
     image_name = parts[1]
     return model_name, image_name
 
+def get_dft_sdc_out_filename(model_file: str, image_file: str, ext="npy") -> str:
+    model_name = Path(model_file).stem
+    image_name = Path(image_file).stem
+    timestap_ms = int(time.time() * 1000)
+    return f"{OUTPUTS_DIR}/sdc--{model_name}--{image_name}--{timestap_ms}.{ext}"
+
+def parse_sdc_out_filename(sdc_file: str) -> tuple:
+    sdc_name = Path(sdc_file).stem
+    parts = sdc_name.split("--")
+    if parts[0] == "sdc":
+        model_name = parts[1]
+        image_name = parts[2]
+        timestamp_ms = int(parts[3])
+        return model_name, image_name, timestamp_ms
+    else:
+        raise Exception(f"Invalid SDC file `{sdc_file}`")
 
 def save_tensors_to_file(tensors_dict: dict, filename: str):
     np.save(filename, tensors_dict)
