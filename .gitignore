@@ -14,3 +14,6 @@ obj/
 
 old_scripts
 tmp
+
+log_helper_wrap.c
+log_helper.py

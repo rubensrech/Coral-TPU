@@ -11,4 +11,7 @@ extern int start_iteration();
 extern int end_iteration();
 extern int log_error_count(unsigned long int kernel_errors);
 extern int log_error_detail(char *string);
+extern int log_info_detail(char *string);
+extern int log_info_count(unsigned long int info_count);
+extern unsigned long int get_iteration_number();
 %}
