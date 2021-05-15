@@ -1,7 +1,7 @@
 import time
 import sys
 
-from include.log_helper_swig_wraper import log_helper as lh
+from log_helper_swig_wraper import log_helper as lh
 
 benchmarkName = "my_benchmark"
 benchmarkDetails = "benchmark details, benchmark details, benchmark details, benchmark details"
