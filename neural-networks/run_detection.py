@@ -37,18 +37,35 @@ def create_interpreter(model_file, cpu=False):
 
     return interpreter
 
-def set_interpreter_intput(interpreter, image_file):
+def preload_images(input_file, interpreter):
     t0 = time.perf_counter()
 
-    image = Image.open(image_file)
-    in_tensor, scale = common.set_resized_input(interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS)) 
+    with open(input_file, 'r') as f:
+        image_files = f.read().splitlines()
+    
+    images = list(map(Image.open, image_files))
+
+    resized_images = []
+    for image in images:
+        resized, scale = common.resize_input(image, interpreter)
+        resized_images.append({ 'data': resized, 'scale': scale, 'filename': image.filename })
+
+    t1 = time.perf_counter()
+
+    Logger.info("Input images loaded and resized successfully")
+    Logger.timing("Load and resize images", t1 - t0)
+
+    return resized_images
+
+def set_interpreter_intput(interpreter, resized_image):
+    t0 = time.perf_counter()
+
+    common.set_resized_input(interpreter, resized_image)
 
     t1 = time.perf_counter()
 
     Logger.info("Interpreter input set successfully")
     Logger.timing("Set interpreter input", t1 - t0)
-
-    return in_tensor, scale
 
 def perform_inference(interpreter):
     t0 = time.perf_counter()
@@ -163,26 +180,29 @@ def main():
 
     interpreter = create_interpreter(model_file, cpu)
 
+    images = preload_images(input_file, interpreter)
+
     for i in range(iterations):
         Logger.info(f"Iteration {i}")
 
-        with open(input_file, 'r') as f:
-            inputs = f.read().splitlines()
+        for img in images:
+            image_file = img['filename']
+            image_scale = img['scale']
+            image = img['data']
 
-        for image_file in inputs:
             Logger.info(f"Predicting image: {image_file}")
 
-            _, img_scale = set_interpreter_intput(interpreter, image_file)
+            set_interpreter_intput(interpreter, image)
 
             perform_inference(interpreter)
 
             if save_golden:
-                save_golden_output(interpreter, model_file, image_file, img_scale, coral_out_tensors)
+                save_golden_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
                 errs_count = check_output_against_golden(interpreter, coral_out_tensors, golden_file)
                 if errs_count > 0:
-                    sdc_file = save_sdc_output(interpreter, model_file, image_file, img_scale, coral_out_tensors)
+                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
                     Logger.info(f"SDC output saved to file `{sdc_file}`")
 
                     Logger.error(f"SDC: {errs_count} error(s) detected")

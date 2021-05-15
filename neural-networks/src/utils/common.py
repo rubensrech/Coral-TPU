@@ -19,6 +19,8 @@ import time
 import numpy as np
 from pathlib import Path
 
+from PIL import Image
+
 from src.utils import detection
 
 
@@ -74,27 +76,20 @@ def set_input(interpreter, data):
     input_tensor(interpreter)[:, :] = data
 
 
-def set_resized_input(interpreter, size, resize):
-    """Copies a resized and properly zero-padded image to a model's input tensor.
-    Args:
-      interpreter: The ``tf.lite.Interpreter`` to update.
-      size (tuple): The original image size as (width, height) tuple.
-      resize: A function that takes a (width, height) tuple, and returns an
-        image resized to those dimensions.
-    Returns:
-      The resized tensor with zero-padding as tuple
-      (resized_tensor, resize_ratio).
-    """
-    width, height = input_size(interpreter)
-    w, h = size
-    scale = min(width / w, height / h)
-    w, h = int(w * scale), int(h * scale)
+def set_resized_input(interpreter, resized_image):
     tensor = input_tensor(interpreter)
     tensor.fill(0)  # padding
     _, _, channel = tensor.shape
-    result = resize((w, h))
-    tensor[:h, :w] = np.reshape(result, (h, w, channel))
-    return result, (scale, scale)
+    w, h = resized_image.size
+    tensor[:h, :w] = np.reshape(resized_image, (h, w, channel))
+
+def resize_input(image, interpreter):
+    width, height = input_size(interpreter)
+    w, h = image.size
+    scale = min(width / w, height / h)
+    w, h = int(w * scale), int(h * scale)
+    resized = image.resize((w, h), Image.ANTIALIAS)
+    return resized, (scale, scale)
 
 def read_label_file(file_path):
     """Reads labels from a text file and returns it as a dictionary.
