@@ -28,7 +28,7 @@ CC_FLAGS+=-DLOGGING_LEVEL=$(LOGGING_LEVEL) -DMAX_ERRORS_PER_IT=$(MAX_ERRORS_PER_
 EDGETPU_RUNTIME_DIR=$(CURDIR)/../edgetpu_runtime
 TENSORFLOW_DIR=$(CURDIR)/../tensorflow
 TFLITE_AARCH64_LIB_DIR=$(CURDIR)/../tflite-aarch64/lib
-LOG_HELPER_DIR=$(CURDIR)/include
+LOG_HELPER_DIR=$(CURDIR)/../include
 
 run_model: run_model.cpp $(LOG_HELPER_DIR)/log_helper.c
 	aarch64-linux-gnu-g++ $^ -o $@ $(CC_FLAGS) \

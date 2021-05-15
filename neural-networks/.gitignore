@@ -1,2 +1,5 @@
 # CPU models
 ssd_mobilenet_v1_1_metadata_1.tflite
+
+# Inputs list
+inputs/*.txt
