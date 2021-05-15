@@ -208,4 +208,4 @@ def get_detection_raw_output(interpreter):
 
 
 def get_objects(interpreter, img_scale=(1., 1.), threshold=-float('inf')):
-    return get_detection_raw_output(interpreter).get_objects(common.input_size(interpreter), img_scale)
+    return get_detection_raw_output(interpreter).get_objects(common.input_size(interpreter), img_scale, threshold)
