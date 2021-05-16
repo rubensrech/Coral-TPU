@@ -46,7 +46,7 @@ for benchmark in BENCHMARKS_DESCRIPTORS:
 
     full_path_to_script = get_full_path("run_detection.py")
     benchmark_exec_cmd = f"sudo python3 {full_path_to_script} --model {full_path_to_model} --input {full_path_to_input} --coral-tensors {coral_tensors} --nimages {nimages} --iterations 1000000000"
-    benchmark_kill_cmd = "killall -9 python3"
+    benchmark_kill_cmd = "pkill -9 -f run_detection.py"
     BENCHMARKS_JSON_LIST.append({ "exec": benchmark_exec_cmd, "killcmd": benchmark_kill_cmd })
 
 with open(JSON_FILE, 'w') as outfile:
