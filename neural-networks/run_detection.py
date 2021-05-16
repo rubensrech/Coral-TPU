@@ -225,17 +225,17 @@ def main():
                 if errs_count > 0:
                     Logger.info(f"SDC: {errs_count} error(s) detected")
 
+                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
+                    Logger.info(f"SDC output saved to file `{sdc_file}`")
+                    lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
+                    info_count += 1
+
                     # Recreate interpreter (avoid repeated errors in case of weights corruption)
                     if RECREATE_INTERPRETER_ON_ERROR:
                         lh.log_info_detail(f"Recreating interpreter")
                         info_count += 1
                         Logger.info(f"Recreating interpreter...")
                         interpreter = create_interpreter(model_file, cpu)
-
-                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
-                    Logger.info(f"SDC output saved to file `{sdc_file}`")
-                    lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
-                    info_count += 1
 
                 lh.log_info_count(int(info_count))
                 lh.log_error_count(int(errs_count))
