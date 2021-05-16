@@ -7,7 +7,7 @@ ORIG_SUFFIX = ".orig"
 
 def corrupt_out_file(out_file, error_descriptors):
     # Save original file
-    os.system(f'cp {out_file} {out_file + ORIG_SUFFIX}')
+    os.system(f'cp -n {out_file} {out_file + ORIG_SUFFIX}')
 
     out_data = common.load_tensors_from_file(out_file)
 
@@ -36,7 +36,6 @@ def corrupt_out_file(out_file, error_descriptors):
 def revert(out_file):
     orig_file = out_file + ORIG_SUFFIX
     os.system(f'cp {orig_file} {out_file}', )
-    os.unlink(orig_file)
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)

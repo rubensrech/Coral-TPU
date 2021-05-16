@@ -227,6 +227,8 @@ def main():
 
                     # Recreate interpreter (avoid repeated errors in case of weights corruption)
                     if RECREATE_INTERPRETER_ON_ERROR:
+                        lh.log_info_detail(f"Recreating interpreter")
+                        info_count += 1
                         Logger.info(f"Recreating interpreter...")
                         interpreter = create_interpreter(model_file, cpu)
 
