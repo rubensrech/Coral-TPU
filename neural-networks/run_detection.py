@@ -11,7 +11,9 @@ from src.utils import common
 from src.utils.logger import Logger
 Logger.setLevel(Logger.Level.TIMING)
 
-sys.path.insert(0, '../include/log_helper_swig_wraper')
+
+FILE_FULL_PATH = Path(__file__).parent.absolute()
+sys.path.insert(0, f'{FILE_FULL_PATH}/../include/log_helper_swig_wraper')
 import log_helper as lh
 
 MAX_ERR_PER_IT = 500
