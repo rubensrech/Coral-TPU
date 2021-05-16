@@ -1,21 +1,29 @@
 #!/usr/local/bin/python3
 
+import sys
 import time
 import argparse
-from typing import IO
 import numpy as np
 from pathlib import Path
 from PIL import Image
 
-from src.utils.logger import Logger
-Logger.setLevel(Logger.Level.DEBUG)
-
 from src.utils import common
+from src.utils.logger import Logger
+Logger.setLevel(Logger.Level.TIMING)
+
+sys.path.insert('../include/log_helper_swig_wraper')
+import log_helper as lh
 
 MAX_ERR_PER_IT = 500
 INCLUDE_CORAL_OUT_IN_SDC_FILES = False
+RECREATE_INTERPRETER_ON_ERROR = True
 
 # Auxiliary functions
+
+def log_exception_and_exit(err_msg):
+    lh.log_error_detail(err_msg)
+    lh.end_log_file()
+    raise Exception(err_msg)
 
 def save_output_to_file(raw_out_dict, filename, model_input_size, input_image_scale):
     data = { **raw_out_dict, 'input_image_scale': input_image_scale, 'model_input_size': model_input_size }
@@ -23,11 +31,19 @@ def save_output_to_file(raw_out_dict, filename, model_input_size, input_image_sc
 
 # Main functions
 
+def init_log_file(model_file, input_file):
+    if lh.start_log_file("Detection", f"model_file: {model_file}, input_file: {input_file}") > 0:
+        log_exception_and_exit("Could not initialize log file")
+
+    lh.set_max_errors_iter(MAX_ERR_PER_IT)
+    lh.set_iter_interval_print(1)
+
+    Logger.info(f"Log file is `{lh.get_log_file_name()}`")
+
 def create_interpreter(model_file, cpu=False):
     t0 = time.perf_counter()
 
     interpreter = common.create_interpreter(model_file, cpu)
-
     interpreter.allocate_tensors()
 
     t1 = time.perf_counter()
@@ -70,7 +86,9 @@ def set_interpreter_intput(interpreter, resized_image):
 def perform_inference(interpreter):
     t0 = time.perf_counter()
 
+    lh.start_iteration()
     interpreter.invoke()
+    lh.end_iteration()
 
     t1 = time.perf_counter()
 
@@ -99,7 +117,7 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
         gold_out = common.load_tensors_from_file(golden_file)
         curr_out = common.get_raw_output(interpreter, coral_out_tensors)
     except IOError:
-        raise Exception("Could not open golden file")
+        log_exception_and_exit("Could not open golden file")
 
     out_total_errs_count = 0
     logged_errs_count = 0
@@ -114,7 +132,7 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
                 curr_tensor = np.array(curr_tensor)
 
             if curr_tensor.shape != gold_tensor.shape:
-                raise Exception("Invalid golden file for current execution")
+                log_exception_and_exit("Invalid golden file for current execution")
 
             diff_pos = np.flatnonzero(gold_tensor != curr_tensor)
             tensor_errs_count = len(diff_pos)
@@ -127,16 +145,16 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
                 for i in range(tensor_errs_count):
                     if logged_errs_count < MAX_ERR_PER_IT:
                         pos = np.unravel_index(diff_pos[i], curr_tensor.shape)
-                        Logger.error(f"tensor: {tensorKey}, position: {pos}, expected: {expected[i]}, result: {result[i]}")
+                        lh.log_error_detail(f"tensor: {tensorKey}, position: {pos}, expected: {expected[i]}, result: {result[i]}")
                         logged_errs_count += 1
 
         except KeyError as ex:
-            raise Exception("Invalid golden file for current execution") from ex
+            log_exception_and_exit("Invalid golden file for current execution")
 
     t1 = time.perf_counter()
 
     if out_total_errs_count > 0:
-        Logger.error(f"Output doesn't match golden: {out_total_errs_count} error(s)")
+        Logger.info(f"Output doesn't match golden: {out_total_errs_count} error(s)")
     else:
         Logger.info(f"Output matches golden")
 
@@ -175,8 +193,10 @@ def main():
     coral_out_tensors = list(map(int, args.coral_tensors.split(",")))
     iterations = args.iterations
     save_golden = args.save_golden
-
     cpu = not Path(model_file).stem.endswith('_edgetpu')
+
+    if not save_golden:
+        init_log_file(model_file, input_file)
 
     interpreter = create_interpreter(model_file, cpu)
 
@@ -201,15 +221,28 @@ def main():
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
                 errs_count = check_output_against_golden(interpreter, coral_out_tensors, golden_file)
+                info_count = 0
                 if errs_count > 0:
+                    Logger.info(f"SDC: {errs_count} error(s) detected")
+
+                    # Recreate interpreter (avoid repeated errors in case of weights corruption)
+                    if RECREATE_INTERPRETER_ON_ERROR:
+                        Logger.info(f"Recreating interpreter...")
+                        interpreter = create_interpreter(model_file, cpu)
+
                     sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
                     Logger.info(f"SDC output saved to file `{sdc_file}`")
+                    lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
+                    info_count += 1
 
-                    Logger.error(f"SDC: {errs_count} error(s) detected")
-                    # LogHelper.log_error_count(errs_count)
+                lh.log_info_count(int(info_count))
+                lh.log_error_count(int(errs_count))
 
         if save_golden:
             break
+    
+    if not save_golden:
+        lh.end_log_file()
 
 if __name__ == '__main__':
     main()
