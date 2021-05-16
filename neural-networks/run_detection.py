@@ -31,8 +31,11 @@ def save_output_to_file(raw_out_dict, filename, model_input_size, input_image_sc
 
 # Main functions
 
-def init_log_file(model_file, input_file):
-    if lh.start_log_file("Detection", f"model_file: {model_file}, input_file: {input_file}") > 0:
+def init_log_file(model_file, input_file, nimages):
+    BENCHMARK_NAME = "Detection"
+    nimages_info = f", nimages: {nimages}" if not nimages is None else ""
+    BENCHMARK_INFO = f"model_file: {model_file}, input_file: {input_file}{nimages_info}"
+    if lh.start_log_file(BENCHMARK_NAME, BENCHMARK_INFO) > 0:
         log_exception_and_exit("Could not initialize log file")
 
     lh.set_max_errors_iter(MAX_ERR_PER_IT)
@@ -53,11 +56,14 @@ def create_interpreter(model_file, cpu=False):
 
     return interpreter
 
-def preload_images(input_file, interpreter):
+def preload_images(input_file, interpreter, nmax=None):
     t0 = time.perf_counter()
 
     with open(input_file, 'r') as f:
         image_files = f.read().splitlines()
+
+    if not nmax is None:
+        image_files = image_files[:nmax]
     
     images = list(map(Image.open, image_files))
 
@@ -184,6 +190,7 @@ def main():
     parser.add_argument('-i', '--input', required=True, help='File path to list of images to be processed')
     parser.add_argument('-t', '--coral-tensors', required=True, help='Tensor indexes of the output from Coral TPU (comma separated)')
     # Optionals
+    parser.add_argument('-n', '--nimages', type=int, default=None, help='Max number of images that should be processed')
     parser.add_argument('--iterations', type=int, default=1, help='Number of times to run inference')
     parser.add_argument('--save-golden', action='store_true', default=False, help='Whether the output should be saved to a binary file in .npy format or not')
     args = parser.parse_args()
@@ -191,16 +198,17 @@ def main():
     model_file = args.model
     input_file = args.input
     coral_out_tensors = list(map(int, args.coral_tensors.split(",")))
+    nimages = args.nimages
     iterations = args.iterations
     save_golden = args.save_golden
     cpu = not Path(model_file).stem.endswith('_edgetpu')
 
     if not save_golden:
-        init_log_file(model_file, input_file)
+        init_log_file(model_file, input_file, nimages)
 
     interpreter = create_interpreter(model_file, cpu)
 
-    images = preload_images(input_file, interpreter)
+    images = preload_images(input_file, interpreter, nimages)
 
     for i in range(iterations):
         Logger.info(f"Iteration {i}")

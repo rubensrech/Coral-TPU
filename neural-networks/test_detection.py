@@ -40,7 +40,8 @@ def main():
     interpreter.allocate_tensors()
 
     image = Image.open(args.input)
-    _, scale = common.set_resized_input(interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
+    resized_image, scale = common.resize_input(image, interpreter)
+    common.set_resized_input(interpreter, resized_image)
 
     print('----INFERENCE TIME----')
     start = time.perf_counter()
