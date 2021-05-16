@@ -35,7 +35,7 @@ def corrupt_out_file(out_file, error_descriptors):
 
 def revert(out_file):
     orig_file = out_file + ORIG_SUFFIX
-    os.system(f'cp {orig_file} {out_file}', )
+    os.system(f'cp {orig_file} {out_file}')
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
