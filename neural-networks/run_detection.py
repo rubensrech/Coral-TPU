@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 
 import sys
 import time
@@ -11,7 +11,7 @@ from src.utils import common
 from src.utils.logger import Logger
 Logger.setLevel(Logger.Level.TIMING)
 
-sys.path.insert('../include/log_helper_swig_wraper')
+sys.path.insert(0, '../include/log_helper_swig_wraper')
 import log_helper as lh
 
 MAX_ERR_PER_IT = 500
