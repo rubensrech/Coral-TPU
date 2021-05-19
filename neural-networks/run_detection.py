@@ -107,7 +107,7 @@ def save_golden_output(interpreter, model_file, image_file, img_scale):
     t0 = time.perf_counter()
 
     golden_file = common.get_dft_golden_filename(model_file, image_file)
-    raw_out = detection.get_detection_raw_output(interpreter)
+    raw_out = detection.get_detection_raw_output(interpreter)._asdict()
     model_in_size = common.input_size(interpreter)
     save_output_to_file(raw_out, golden_file, model_in_size, img_scale)
 
@@ -123,7 +123,7 @@ def check_output_against_golden(interpreter, golden_file):
 
     try:
         gold_out = common.load_tensors_from_file(golden_file)
-        curr_out = detection.get_detection_raw_output(interpreter)
+        curr_out = detection.get_detection_raw_output(interpreter)._asdict()
     except IOError:
         log_exception_and_exit("Could not open golden file")
 
@@ -174,7 +174,7 @@ def save_sdc_output(interpreter, model_file, img_file, img_scale):
     t0 = time.perf_counter()
 
     sdc_out_file = common.get_dft_sdc_out_filename(model_file, img_file)
-    raw_out = detection.get_detection_raw_output(interpreter)
+    raw_out = detection.get_detection_raw_output(interpreter)._asdict()
     model_in_size = common.input_size(interpreter)
     save_output_to_file(raw_out, sdc_out_file, model_in_size, img_scale)
 
