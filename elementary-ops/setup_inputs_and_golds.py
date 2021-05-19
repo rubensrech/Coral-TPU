@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 JSON_FILE = "/home/carol/radiation-benchmarks/scripts/json_files/coralElementaryOps.json"
+JSON_PARAM = "/home/carol/radiation-benchmarks/scripts/json_files/json_parameter"
 
 INSTALL_DIR = Path(__file__).parent.absolute()
 MODELS_DIR = f"{INSTALL_DIR}/models"
@@ -24,7 +25,17 @@ def get_full_path(filename):
 BENCHMARKS_JSON_LIST = []
 BENCHMARKS_MODELS = []
 
-for model_filename in os.listdir(MODELS_DIR):
+model_files = os.listdir(MODELS_DIR)
+model_files = [
+    'conv_2d_1_256_256_1_40_40_1_1_quant_edgetpu.tflite',
+    'conv_2d_1_512_512_1_40_40_1_1_quant_edgetpu.tflite',
+    'conv_2d_1_1024_1024_1_40_40_1_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_256_256_1_20_20_1_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_512_512_1_20_20_1_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_1024_1024_1_20_20_1_1_quant_edgetpu.tflite',
+]
+
+for model_filename in model_files:
     if model_filename.endswith("edgetpu.tflite"):
         full_path_to_model = f"{MODELS_DIR}/{model_filename}"
 
@@ -50,6 +61,10 @@ for model_filename in os.listdir(MODELS_DIR):
 with open(JSON_FILE, 'w') as outfile:
     json.dump(BENCHMARKS_JSON_LIST, outfile, indent=4)
 
+with open(JSON_PARAM, 'w') as f:
+    f.write(JSON_FILE)
+
 print(f"{len(BENCHMARKS_MODELS)} BENCHMARKS GENERATED:")
 print(json.dumps(BENCHMARKS_MODELS, indent=4))
 print(f"BENCHMARKS JSON PARAMETER WRITTEN TO `{JSON_FILE}`")
+print(f"JSON PARAMETER UPDATED")
