@@ -166,10 +166,12 @@ def load_tensors_from_file(filename: str) -> dict:
     return np.load(filename, allow_pickle=True).item()
 
 
-def get_raw_output(interpreter, coral_out_tensors_idxs=[]) -> dict:
-    det_out = detection.get_detection_raw_output(interpreter)._asdict()
-    coral_out = { tensorIdx: interpreter.tensor(tensorIdx)() for tensorIdx in coral_out_tensors_idxs }
-    return { **det_out, **coral_out }
+def get_raw_output(interpreter) -> dict:
+    outs_tensors_idxs = list(map(lambda d: d['index'], interpreter.get_output_details()))
+    raw_out_dict = { tensor_idx: interpreter.get_tensor(tensor_idx) for tensor_idx in outs_tensors_idxs }
+    return raw_out_dict
+
+
 
 
 def create_interpreter(model_file, cpu=False):
@@ -177,7 +179,8 @@ def create_interpreter(model_file, cpu=False):
         from tensorflow import lite as tflite
         interpreter = tflite.Interpreter(model_file)
     else:
-        from pycoral.utils.edgetpu import make_interpreter        
+        from pycoral.utils.edgetpu import make_interpreter
         interpreter = make_interpreter(model_file)
 
     return interpreter
+    

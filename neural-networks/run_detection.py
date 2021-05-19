@@ -7,7 +7,7 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 
-from src.utils import common
+from src.utils import common, detection
 from src.utils.logger import Logger
 Logger.setLevel(Logger.Level.TIMING)
 
@@ -45,10 +45,10 @@ def init_log_file(model_file, input_file, nimages):
 
     Logger.info(f"Log file is `{lh.get_log_file_name()}`")
 
-def create_interpreter(model_file, cpu=False):
+def create_interpreter(model_file):
     t0 = time.perf_counter()
 
-    interpreter = common.create_interpreter(model_file, cpu)
+    interpreter = common.create_interpreter(model_file)
     interpreter.allocate_tensors()
 
     t1 = time.perf_counter()
@@ -103,11 +103,11 @@ def perform_inference(interpreter):
     Logger.info("Inference performed successfully")
     Logger.timing("Perform inference", t1 - t0)
 
-def save_golden_output(interpreter, model_file, image_file, img_scale, coral_out_tensors):
+def save_golden_output(interpreter, model_file, image_file, img_scale):
     t0 = time.perf_counter()
 
     golden_file = common.get_dft_golden_filename(model_file, image_file)
-    raw_out = common.get_raw_output(interpreter, coral_out_tensors)
+    raw_out = detection.get_detection_raw_output(interpreter)
     model_in_size = common.input_size(interpreter)
     save_output_to_file(raw_out, golden_file, model_in_size, img_scale)
 
@@ -118,12 +118,12 @@ def save_golden_output(interpreter, model_file, image_file, img_scale, coral_out
 
     return golden_file
 
-def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
+def check_output_against_golden(interpreter, golden_file):
     t0 = time.perf_counter()
 
     try:
         gold_out = common.load_tensors_from_file(golden_file)
-        curr_out = common.get_raw_output(interpreter, coral_out_tensors)
+        curr_out = detection.get_detection_raw_output(interpreter)
     except IOError:
         log_exception_and_exit("Could not open golden file")
 
@@ -170,11 +170,11 @@ def check_output_against_golden(interpreter, coral_out_tensors, golden_file):
             
     return out_total_errs_count
 
-def save_sdc_output(interpreter, model_file, img_file, img_scale, coral_out_tensors=[]):
+def save_sdc_output(interpreter, model_file, img_file, img_scale):
     t0 = time.perf_counter()
 
     sdc_out_file = common.get_dft_sdc_out_filename(model_file, img_file)
-    raw_out = common.get_raw_output(interpreter, coral_out_tensors if INCLUDE_CORAL_OUT_IN_SDC_FILES else [])
+    raw_out = detection.get_detection_raw_output(interpreter)
     model_in_size = common.input_size(interpreter)
     save_output_to_file(raw_out, sdc_out_file, model_in_size, img_scale)
 
@@ -190,7 +190,6 @@ def main():
     # Required
     parser.add_argument('-m', '--model', required=True, help='File path to .tflite file')
     parser.add_argument('-i', '--input', required=True, help='File path to list of images to be processed')
-    parser.add_argument('-t', '--coral-tensors', required=True, help='Tensor indexes of the output from Coral TPU (comma separated)')
     # Optionals
     parser.add_argument('-n', '--nimages', type=int, default=None, help='Max number of images that should be processed')
     parser.add_argument('--iterations', type=int, default=1, help='Number of times to run inference')
@@ -199,16 +198,14 @@ def main():
 
     model_file = args.model
     input_file = args.input
-    coral_out_tensors = list(map(int, args.coral_tensors.split(",")))
     nimages = args.nimages
     iterations = args.iterations
     save_golden = args.save_golden
-    cpu = not Path(model_file).stem.endswith('_edgetpu')
 
     if not save_golden:
         init_log_file(model_file, input_file, nimages)
 
-    interpreter = create_interpreter(model_file, cpu)
+    interpreter = create_interpreter(model_file)
 
     images = preload_images(input_file, interpreter, nimages)
 
@@ -227,15 +224,15 @@ def main():
             perform_inference(interpreter)
 
             if save_golden:
-                save_golden_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
+                save_golden_output(interpreter, model_file, image_file, image_scale)
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
-                errs_count = check_output_against_golden(interpreter, coral_out_tensors, golden_file)
+                errs_count = check_output_against_golden(interpreter, golden_file)
                 info_count = 0
                 if errs_count > 0:
                     Logger.info(f"SDC: {errs_count} error(s) detected")
 
-                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale, coral_out_tensors)
+                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale)
                     Logger.info(f"SDC output saved to file `{sdc_file}`")
                     lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
                     info_count += 1
@@ -245,7 +242,7 @@ def main():
                         lh.log_info_detail(f"Recreating interpreter")
                         info_count += 1
                         Logger.info(f"Recreating interpreter...")
-                        interpreter = create_interpreter(model_file, cpu)
+                        interpreter = create_interpreter(model_file)
 
                 lh.log_info_count(int(info_count))
                 lh.log_error_count(int(errs_count))
