@@ -30,9 +30,9 @@ model_files = [
     'conv_2d_1_256_256_1_40_40_1_1_quant_edgetpu.tflite',
     'conv_2d_1_512_512_1_40_40_1_1_quant_edgetpu.tflite',
     'conv_2d_1_1024_1024_1_40_40_1_1_quant_edgetpu.tflite',
-    'depthwise_conv_2d_1_256_256_1_20_20_1_1_quant_edgetpu.tflite',
-    'depthwise_conv_2d_1_512_512_1_20_20_1_1_quant_edgetpu.tflite',
-    'depthwise_conv_2d_1_1024_1024_1_20_20_1_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_256_256_3_20_20_3_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_512_512_3_20_20_3_1_quant_edgetpu.tflite',
+    'depthwise_conv_2d_1_1024_1024_3_20_20_3_1_quant_edgetpu.tflite',
 ]
 
 for model_filename in model_files:
