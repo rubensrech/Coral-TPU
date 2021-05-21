@@ -19,6 +19,7 @@ import log_helper as lh
 MAX_ERR_PER_IT = 500
 INCLUDE_CORAL_OUT_IN_SDC_FILES = False
 RECREATE_INTERPRETER_ON_ERROR = True
+DETECTION_THRESHOLD = 0.3
 
 # Auxiliary functions
 
@@ -27,8 +28,8 @@ def log_exception_and_exit(err_msg):
     lh.end_log_file()
     raise Exception(err_msg)
 
-def save_output_to_file(raw_out_dict, filename, model_input_size, input_image_scale):
-    data = { **raw_out_dict, 'input_image_scale': input_image_scale, 'model_input_size': model_input_size }
+def save_output_to_file(detection_output, filename, model_input_size, input_image_scale):
+    data = { 'detection_output': detection_output, 'input_image_scale': input_image_scale, 'model_input_size': model_input_size }
     common.save_tensors_to_file(data, filename)
 
 # Main functions
@@ -107,9 +108,9 @@ def save_golden_output(interpreter, model_file, image_file, img_scale):
     t0 = time.perf_counter()
 
     golden_file = common.get_dft_golden_filename(model_file, image_file)
-    raw_out = detection.get_detection_raw_output(interpreter)._asdict()
+    det_out = detection.get_objects(interpreter, nparray=True)
     model_in_size = common.input_size(interpreter)
-    save_output_to_file(raw_out, golden_file, model_in_size, img_scale)
+    save_output_to_file(det_out, golden_file, model_in_size, img_scale)
 
     t1 = time.perf_counter()
 
@@ -122,53 +123,55 @@ def check_output_against_golden(interpreter, golden_file):
     t0 = time.perf_counter()
 
     try:
-        gold_out = common.load_tensors_from_file(golden_file)
-        curr_out = detection.get_detection_raw_output(interpreter)._asdict()
-    except IOError:
+        gold = common.load_tensors_from_file(golden_file).get('detection_output')
+        out = detection.get_objects(interpreter, nparray=True)
+    except:
         log_exception_and_exit("Could not open golden file")
 
-    out_total_errs_count = 0
-    logged_errs_count = 0
+    errs_above_thresh = 0
+    errs_below_thresh = 0
+    g_objs, o_objs = 0, 0
 
-    for tensorKey in curr_out:
-        try:
-            gold_tensor = gold_out[tensorKey]
-            curr_tensor = curr_out[tensorKey]
+    i = 0
+    for o, g in zip(out, gold):
+        o_class, g_class = o[0], g[0]
+        o_score, g_score = o[1], g[1]
+        o_bbox, g_bbox = o[2:6], g[2:6]
 
-            if type(curr_tensor) is int:
-                gold_tensor = np.array(gold_tensor)
-                curr_tensor = np.array(curr_tensor)
+        if g_score > DETECTION_THRESHOLD: g_objs += 1
+        if o_score > DETECTION_THRESHOLD: o_objs += 1
 
-            if curr_tensor.shape != gold_tensor.shape:
-                log_exception_and_exit("Invalid golden file for current execution")
+        if not np.array_equal(o, g):
+            if g_score > DETECTION_THRESHOLD:
+                errs_above_thresh += np.count_nonzero(o != g)
 
-            diff_pos = np.flatnonzero(gold_tensor != curr_tensor)
-            tensor_errs_count = len(diff_pos)
-            if tensor_errs_count > 0:
-                out_total_errs_count += tensor_errs_count
+                if o_class != g_class:
+                    lh.log_error_detail(f"Obj {i}: wrong class (e: {g_class}, r: {o_class})")
+                if o_score != g_score:
+                    lh.log_error_detail(f"Obj {i}: wrong score (e: {g_score}, r: {o_score})")
+                if not np.array_equal(o_bbox, g_bbox):
+                    lh.log_error_detail(f"Obj {i}: wrong bbox (e: {g_bbox}, r: {o_bbox})")
 
-                expected = gold_tensor.ravel()[diff_pos]
-                result = curr_tensor.ravel()[diff_pos]
+            else:
+                errs_below_thresh += np.count_nonzero(o != g)
 
-                for i in range(tensor_errs_count):
-                    if logged_errs_count < MAX_ERR_PER_IT:
-                        pos = np.unravel_index(diff_pos[i], curr_tensor.shape)
-                        lh.log_error_detail(f"tensor: {tensorKey}, position: {pos}, expected: {expected[i]}, result: {result[i]}")
-                        logged_errs_count += 1
+        i += 1
 
-        except KeyError as ex:
-            log_exception_and_exit("Invalid golden file for current execution")
+    if g_objs != o_objs:    
+        lh.log_error_detail(f"Wrong amount of detections (e: {g_objs}, r: {o_objs})")
+    if errs_above_thresh > 0:
+        lh.log_error_detail(f"Errors above thresh: {errs_above_thresh}")
+    if errs_below_thresh > 0:
+        lh.log_error_detail(f"Errors below thresh: {errs_below_thresh}")
 
     t1 = time.perf_counter()
 
-    if out_total_errs_count > 0:
-        Logger.info(f"Output doesn't match golden: {out_total_errs_count} error(s)")
-    else:
-        Logger.info(f"Output matches golden")
-
+    total_errs = errs_above_thresh + errs_below_thresh
+    if total_errs > 0:
+        Logger.info(f"Output doesn't match golden")
     Logger.timing("Check output", t1 - t0)
             
-    return out_total_errs_count
+    return errs_above_thresh, errs_below_thresh
 
 def save_sdc_output(interpreter, model_file, img_file, img_scale):
     t0 = time.perf_counter()
@@ -227,15 +230,17 @@ def main():
                 save_golden_output(interpreter, model_file, image_file, image_scale)
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
-                errs_count = check_output_against_golden(interpreter, golden_file)
+                errs_abv_thresh, errs_blw_thresh = check_output_against_golden(interpreter, golden_file)
+                errs_count = errs_abv_thresh + errs_blw_thresh
                 info_count = 0
                 if errs_count > 0:
-                    Logger.info(f"SDC: {errs_count} error(s) detected")
+                    Logger.info(f"SDC: {errs_count} error(s) (above thresh: {errs_abv_thresh}, below thresh: {errs_blw_thresh})")
 
-                    sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale)
-                    Logger.info(f"SDC output saved to file `{sdc_file}`")
-                    lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
-                    info_count += 1
+                    if errs_abv_thresh > 0:
+                        sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale)
+                        Logger.info(f"SDC output saved to file `{sdc_file}`")
+                        lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
+                        info_count += 1
 
                     # Recreate interpreter (avoid repeated errors in case of weights corruption)
                     if RECREATE_INTERPRETER_ON_ERROR:

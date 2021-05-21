@@ -26,6 +26,11 @@ class Object(collections.namedtuple('Object', ['id', 'score', 'bbox'])):
     .. py:attribute:: bbox
         A :obj:`BBox` object defining the object's location.
     """
+
+    @property
+    def nparray(self):
+        return np.array(self, dtype=object)
+
     def print(self, labels={}):
         print(labels.get(self.id, self.id))
         print('  id:    ', self.id)
@@ -45,6 +50,10 @@ class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
         Y-axis end point
     """
     __slots__ = ()
+
+    @property
+    def nparray(self):
+        return np.array(self)
 
     @property
     def width(self):
@@ -183,20 +192,24 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
         data = common.load_tensors_from_file(filename)
         return DetectionRawOutput.from_data(data)
 
-    def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None):
+    def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None, nparray=False):
         count = nobjs if not nobjs is None else self.count
         width, height = input_size
         img_scale_x, img_scale_y = img_scale
         sx, sy = width / img_scale_x, height / img_scale_y
 
         def make_object(i):
-            ymin, xmin, ymax, xmax = self.boxes[i]
-            return Object(
-                id=int(self.class_ids[i]),
-                score=self.scores[i],
-                bbox=BBox(xmin, ymin, xmax, ymax).scale(sx, sy).map(int))
+            if nparray: 
+                return np.concatenate(([int(self.class_ids[i]), self.scores[i]], self.boxes[i]))
+            else:
+                ymin, xmin, ymax, xmax = self.boxes[i]
+                return Object(
+                    id=int(self.class_ids[i]),
+                    score=self.scores[i],
+                    bbox=BBox(xmin, ymin, xmax, ymax).scale(sx, sy).map(int))
 
-        return [make_object(i) for i in range(count) if self.scores[i] >= threshold]
+        objs = [make_object(i) for i in range(count) if self.scores[i] >= threshold]
+        return np.array(objs, dtype=np.float32) if nparray else objs
 
 
 def get_detection_raw_output(interpreter):
@@ -207,5 +220,6 @@ def get_detection_raw_output(interpreter):
         count=int(common.output_tensor(interpreter, 3)[0]))
 
 
-def get_objects(interpreter, img_scale=(1., 1.), threshold=-float('inf')):
-    return get_detection_raw_output(interpreter).get_objects(common.input_size(interpreter), img_scale, threshold)
+def get_objects(interpreter, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None, nparray=False):
+    input_size = common.input_size(interpreter)
+    return get_detection_raw_output(interpreter).get_objects(input_size, img_scale, threshold, nobjs, nparray)
