@@ -247,7 +247,8 @@ def main():
                         lh.log_info_detail(f"Recreating interpreter")
                         info_count += 1
                         Logger.info(f"Recreating interpreter...")
-                        del interpreter
+                        if interpreter is not None:
+                            del interpreter
                         interpreter = create_interpreter(model_file)
 
                 lh.log_info_count(int(info_count))
