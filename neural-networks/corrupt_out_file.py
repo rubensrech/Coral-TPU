@@ -15,7 +15,10 @@ def corrupt_out_file(out_file, ncorruptions=1):
     for _ in range(ncorruptions):
         maxLinIdx = np.product(out_data[tensorName].shape)
         randLinPos = np.random.randint(maxLinIdx)
-        randVal = randVal = np.random.rand() if out_data[tensorName].dtype == 'float32' else np.random.randint(0, 255)
+        if np.issubdtype(out_data[tensorName].dtype, np.floating):
+            randVal = np.random.rand()
+        else:
+            randVal = np.random.randint(0, 255)
         prevVal = out_data[tensorName].ravel()[randLinPos]
         out_data[tensorName].ravel()[randLinPos] = randVal
         position = np.unravel_index(randLinPos, out_data[tensorName].shape)
