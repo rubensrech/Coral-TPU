@@ -27,9 +27,16 @@ class Object(collections.namedtuple('Object', ['id', 'score', 'bbox'])):
         A :obj:`BBox` object defining the object's location.
     """
 
+    @staticmethod
+    def from_nparray(nparray, input_size=None, img_scale=(1.,1.)):
+        return Object(
+            id=int(nparray[0]),
+            score=nparray[1],
+            bbox=BBox.from_nparray(nparray[2:6], input_size, img_scale))
+
     @property
     def nparray(self):
-        return np.array(self, dtype=object)
+        return np.concatenate(([self.id, self.score], self.bbox))
 
     def print(self, labels={}):
         print(labels.get(self.id, self.id))
@@ -50,6 +57,17 @@ class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
         Y-axis end point
     """
     __slots__ = ()
+
+    @staticmethod
+    def from_nparray(nparray, input_size=None, img_scale=(1.,1.)):
+        ymin, xmin, ymax, xmax = nparray
+        bbox = BBox(xmin, ymin, xmax, ymax)
+        if input_size is not None:
+            width, height = input_size
+            img_scale_x, img_scale_y = img_scale
+            sx, sy = width / img_scale_x, height / img_scale_y
+            bbox = bbox.scale(sx, sy).map(int)
+        return bbox
 
     @property
     def nparray(self):
@@ -191,6 +209,22 @@ class DetectionRawOutput(collections.namedtuple('DetectionRawOutput', ['boxes', 
     def from_file(filename):
         data = common.load_tensors_from_file(filename)
         return DetectionRawOutput.from_data(data)
+
+    def objs_from_data(data, threshold=-float('inf')):
+        det_out = data.get('detection_output')
+        img_scale = data.get('input_image_scale')
+        input_size = data.get('model_input_size')
+        if type(det_out) is np.ndarray:
+            objs = [Object.from_nparray(obj_data, input_size, img_scale) for obj_data in det_out]
+            return list(filter(lambda o: o.score >= threshold, objs))
+        elif type(det_out) is dict:
+            det_raw_out = DetectionRawOutput.from_data(det_out)
+            return det_raw_out.get_objects(input_size, img_scale, threshold)
+
+    @staticmethod
+    def objs_from_file(filename, threshold=-float('inf')):
+        data = common.load_tensors_from_file(filename)
+        return DetectionRawOutput.objs_from_data(data, threshold)
 
     def get_objects(self, input_size, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None, nparray=False):
         count = nobjs if not nobjs is None else self.count

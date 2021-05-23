@@ -44,21 +44,17 @@ def is_sdc_critical(sdc_file, labels, threshold=0) -> tuple:
 
     gold_file = get_golden_for_sdc_file(sdc_file)
 
-    gold_data = common.load_tensors_from_file(gold_file)
-    sdc_data = common.load_tensors_from_file(sdc_file)
+    try:
+        gold_data = common.load_tensors_from_file(gold_file)
+        sdc_data = common.load_tensors_from_file(sdc_file)
+    except:
+        errors.append(f"Corrupted file")
+        return False, errors
 
     input_size, img_scale = validate_model_and_input_sizes(gold_data, sdc_data)
 
-    # Load detections
-    gold_det_out = DetectionRawOutput.from_data(gold_data)
-    golden_dets = gold_det_out.get_objects(input_size, img_scale, threshold)
-
-    try:
-        sdc_det_out = DetectionRawOutput.from_data(sdc_data)
-        sdc_dets = sdc_det_out.get_objects(input_size, img_scale, threshold)
-    except IndexError:
-        errors.append(f"Detection raw `count` value was corrupted (expected: {gold_det_out.count}, got: {sdc_det_out.count})")
-        sdc_dets = sdc_det_out.get_objects(input_size, img_scale, threshold, gold_det_out.count)
+    golden_dets = DetectionRawOutput.objs_from_data(gold_data, threshold)
+    sdc_dets = DetectionRawOutput.objs_from_data(sdc_data, threshold)
 
     # Compare amount of detections
     if len(golden_dets) != len(sdc_dets):
@@ -91,7 +87,7 @@ def is_sdc_critical(sdc_file, labels, threshold=0) -> tuple:
     return critical, errors
 
 def main():
-    thresh = 0
+    thresh = 0.5
     labels_file = 'labels/coco_labels.txt'
 
     labels = common.read_label_file(labels_file)
