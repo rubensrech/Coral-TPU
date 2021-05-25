@@ -1,5 +1,6 @@
 # CPU models
 ssd_mobilenet_v1_1_metadata_1.tflite
+inception_v4_299_quant.tflite
 
 !inputs/test-imgs/*
 
@@ -8,3 +9,6 @@ inputs/*.txt
 
 # SDC outputs
 outputs/*
+
+# Test files/scripts
+test.py
