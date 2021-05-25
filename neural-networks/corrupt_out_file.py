@@ -10,7 +10,12 @@ def corrupt_out_file(out_file, ncorruptions=1):
     os.system(f'cp -n {out_file} {out_file + ORIG_SUFFIX}')
 
     out_data = common.load_tensors_from_file(out_file)
-    tensorName = 'detection_output'
+    if 'detection_output' in out_data:
+        tensorName = 'detection_output'
+    elif 'scores' in out_data:
+        tensorName = 'scores'
+    else:
+        raise Exception("Invalid file")
 
     for _ in range(ncorruptions):
         maxLinIdx = np.product(out_data[tensorName].shape)

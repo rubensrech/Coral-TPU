@@ -192,7 +192,6 @@ def main():
 
         for img in images:
             image_file = img['filename']
-            image_scale = img['scale']
             image = img['data']
 
             Logger.info(f"Predicting image: {image_file}")
@@ -202,7 +201,7 @@ def main():
             perform_inference(interpreter)
 
             if save_golden:
-                save_golden_output(interpreter, model_file, image_file, image_scale)
+                save_golden_output(interpreter, model_file, image_file)
             else:
                 golden_file = common.get_dft_golden_filename(model_file, image_file)
                 errs_abv_thresh, errs_blw_thresh = check_output_against_golden(interpreter, golden_file)
@@ -212,7 +211,7 @@ def main():
                     Logger.info(f"SDC: {errs_count} error(s) (above thresh: {errs_abv_thresh}, below thresh: {errs_blw_thresh})")
 
                     if errs_abv_thresh > 0:
-                        sdc_file = save_sdc_output(interpreter, model_file, image_file, image_scale)
+                        sdc_file = save_sdc_output(interpreter, model_file, image_file)
                         Logger.info(f"SDC output saved to file `{sdc_file}`")
                         lh.log_info_detail(f"SDC output saved to file `{sdc_file}`")
                         info_count += 1
