@@ -1,4 +1,5 @@
 import os
+import argparse
 from PIL import Image, ImageDraw
 
 from src.utils.logger import Logger
@@ -87,10 +88,14 @@ def is_sdc_critical(sdc_file, labels, threshold=0) -> tuple:
     return critical, errors
 
 def main():
-    thresh = 0.5
-    labels_file = 'labels/coco_labels.txt'
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-t', '--threshold', type=float, default=0.5, help='Threshold for detection/classification score')
+    parser.add_argument('-l', '--labels', default='labels/coco_labels.txt', help='Path to labels file')
+    args = parser.parse_args()
 
-    labels = common.read_label_file(labels_file)
+    thresh = args.threshold
+
+    labels = common.read_label_file(args.labels)
 
     total = 0
     criticals = 0
