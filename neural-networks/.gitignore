@@ -8,7 +8,7 @@ inception_v4_299_quant.tflite
 inputs/*.txt
 
 # SDC outputs
-outputs/*
+outputs/*.npy
 
 # Test files/scripts
 test.py
