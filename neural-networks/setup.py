@@ -17,6 +17,10 @@ BENCHMARKS_DESCRIPTORS = {
     'detection': [
         { 'model': 'ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite', 'inputs-dir': '/home/carol/radiation-benchmarks/data/VOC2012', 'nimages': 100 },
         { 'model': 'ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite', 'inputs-dir': '/home/carol/radiation-benchmarks/data/VOC2012', 'nimages': 100 },
+        { 'model': 'ssd_mobilenet_v2_catsdogs_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/oxford-pets-100' },
+        { 'model': 'ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/oxford-pets-100' },
+        { 'model': 'ssd_mobilenet_v2_subcoco14_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/subcoco14' },
+        { 'model': 'ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/subcoco14' },
     ],
     'classification': [
         { 'model': 'tfhub_tf2_resnet_50_imagenet_ptq_edgetpu.tflite', 'inputs-dir': '/home/carol/ILSVRC2012_val_100' },
