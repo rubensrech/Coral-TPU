@@ -14,6 +14,9 @@
 # limitations under the License.
 import collections
 import numpy as np
+from typing import List, Tuple
+
+from PIL import Image, ImageDraw
 
 from src.utils import common
 
@@ -257,3 +260,42 @@ def get_detection_raw_output(interpreter):
 def get_objects(interpreter, img_scale=(1., 1.), threshold=-float('inf'), nobjs=None, nparray=False):
     input_size = common.input_size(interpreter)
     return get_detection_raw_output(interpreter).get_objects(input_size, img_scale, threshold, nobjs, nparray)
+
+def draw_detections_and_show(img_name, detections, labels, color='green'):
+    image = Image.open(common.get_input_file_from_name(img_name)).convert('RGB')
+    draw = ImageDraw.Draw(image)
+    for obj in detections:
+        bbox = obj.bbox
+        draw.rectangle([(bbox.xmin, bbox.ymin), (bbox.xmax, bbox.ymax)],
+                    outline=color)
+        draw.text((bbox.xmin + 10, bbox.ymin + 10),
+                '%s\n%.2f' % (labels.get(obj.id, obj.id), obj.score),
+                fill=color)
+    image.show()
+
+def match_detections(gold_dets: List[Object], sdc_dets: List[Object]):
+    n_gold = len(gold_dets)
+    n_sdc = len(sdc_dets)
+
+    iou_matrix = np.zeros((n_gold, n_sdc))
+    for i, gold_det in enumerate(gold_dets):
+        for j, sdc_det in enumerate(sdc_dets):
+            iou = BBox.iou(gold_det.bbox, sdc_det.bbox)
+            iou_matrix[i, j] = iou
+            # Best IoU, so the other bboxes can be ignored
+            if iou == 1.0: break
+
+    matched_dets: List[Tuple[Object, Object, int]] = []
+
+    if n_gold > n_sdc:
+        for sdc_idx in range(n_sdc):
+            best_iou_gold_idx = np.argmax(iou_matrix[:, sdc_idx])
+            best_iou = iou_matrix[best_iou_gold_idx, sdc_idx]
+            matched_dets.append((gold_dets[best_iou_gold_idx], sdc_dets[sdc_idx], best_iou))
+    else:
+        for gold_idx in range(n_gold):
+            best_iou_sdc_idx = np.argmax(iou_matrix[gold_idx, :])
+            best_iou = iou_matrix[gold_idx, best_iou_sdc_idx]
+            matched_dets.append((gold_dets[gold_idx], sdc_dets[best_iou_sdc_idx], best_iou))
+
+    return matched_dets

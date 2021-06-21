@@ -14,14 +14,20 @@ class Logger:
         Logger.level = level
 
     @staticmethod
-    def error(msg: str):
+    def error(msg: str, ex: Exception = None):
         if Logger.level >= Logger.Level.ERROR:
-            print(f"ERROR: {msg}")
+            if ex:
+                print(f"ERROR: {msg}", ex)
+            else:
+                print(f"ERROR: {msg}")
 
     @staticmethod
-    def info(msg: str):
+    def info(msg: str, ex: Exception = None):
         if Logger.level >= Logger.Level.INFO:
-            print(f"INFO: {msg}")
+            if ex:
+                print(f"INFO: {msg}", ex)
+            else:
+                print(f"INFO: {msg}")
             
     @staticmethod
     def timing(msg: str, seconds: float):

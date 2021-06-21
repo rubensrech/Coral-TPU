@@ -1,0 +1,96 @@
+
+---- SDC OUTPUT ANALYSIS SUMMARY ----
+
+ - Full analysis output file: /Users/rubensrechjunior/Downloads/TPU/Coral-TPU/neural-networks/outputs/sdcs-analysis-full-low-energy.txt
+ - Threshold: 0.50
+
+>  MODELS
+
+  ssd_mobilenet_v2_coco_quant_postprocess_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 23
+    - Critical SDCs: 2 (8.70 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 4
+      - WrongDetsNumbe: 2 (50.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 2 (50.00 %)
+
+  ssdlite_mobiledet_coco_qat_postprocess_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 229
+    - Critical SDCs: 26 (11.35 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 81
+      - WrongDetsNumbe: 16 (19.75 %)
+      - BBox: 9 (11.11 %)
+      - WrongClass: 7 (8.64 %)
+      - WrongScore: 49 (60.49 %)
+
+  ssd_mobilenet_v2_catsdogs_quant_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+
+  ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+
+  ssd_mobilenet_v2_subcoco14_quant_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+
+  ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu:
+    - Task: DETECTION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+
+  tfhub_tf2_resnet_50_imagenet_ptq_edgetpu:
+    - Task: CLASSIFICATION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+
+  inception_v4_299_quant_edgetpu:
+    - Task: CLASSIFICATION
+    - Total SDCs: 0
+    - Critical SDCs: 0 (0.00 %)
+    - Ignored SDCs: 0 (0.00 %)
+    - Total SDCs errors: 0
+      - WrongDetsNumbe: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
+      - WrongClass: 0 (0.00 %)
+      - WrongScore: 0 (0.00 %)
+

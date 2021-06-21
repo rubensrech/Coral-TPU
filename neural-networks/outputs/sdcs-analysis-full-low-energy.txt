@@ -1,0 +1,440 @@
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622139004265.npy: CRITICAL
+	* Wrong number of detections (expected: 6, got: 5)
+	* Scores mismatch (expected: 0.546875, got: 0.55859375)
+	* Scores mismatch (expected: 0.55859375, got: 0.546875)
+	* Scores mismatch (expected: 0.546875, got: 0.53515625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001185--1622323006179.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002673--1622200217006.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006904--1622243246148.npy: CRITICAL
+	* Wrong class (expected: person, got: car, IoU: 0.04717741935483871)
+	* BBox IoU < 0.5 (IoU: 0.04717741935483871)
+	* Scores mismatch (expected: 0.640625, got: 0.75390625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003646--1622300989601.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001783--1622206429183.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003434--1622366467754.npy: OK
+	* Scores mismatch (expected: 0.51171875, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001168--1622232475243.npy: OK
+	* Scores mismatch (expected: 0.734375, got: 0.7265625)
+	* Scores mismatch (expected: 0.6953125, got: 0.70703125)
+	* Scores mismatch (expected: 0.65234375, got: 0.640625)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006407--1622276031685.npy: CRITICAL
+	* Scores mismatch (expected: 0.68359375, got: 0.67578125)
+	* Scores mismatch (expected: 0.62890625, got: 0.640625)
+	* Wrong class (expected: car, got: person, IoU: 0.36)
+	* BBox IoU < 0.5 (IoU: 0.36)
+	* Scores mismatch (expected: 0.5234375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003044--1622180025000.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002620--1622179008754.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005655--1622323148297.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003049--1622124676233.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002620--1622387282059.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622367593183.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003434--1622318963048.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001783--1622244933948.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006284--1622239004132.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000734--1622386796006.npy: OK
+	* Scores mismatch (expected: 0.7890625, got: 0.78125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001168--1622363174149.npy: OK
+	* Scores mismatch (expected: 0.734375, got: 0.7265625)
+	* Scores mismatch (expected: 0.6953125, got: 0.70703125)
+	* Scores mismatch (expected: 0.6640625, got: 0.65234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001705--1622263868230.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001528--1622194509581.npy: CRITICAL
+	* Wrong number of detections (expected: 6, got: 7)
+	* Scores mismatch (expected: 0.59765625, got: 0.609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_000706--1622257047460.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001151--1622252398486.npy: OK
+	* Scores mismatch (expected: 0.59765625, got: 0.609375)
+	* Scores mismatch (expected: 0.5234375, got: 0.51171875)
+	* Scores mismatch (expected: 0.5, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003044--1622257009106.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 6)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005891--1622235528739.npy: OK
+	* Scores mismatch (expected: 0.71484375, got: 0.70703125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006891--1622188278237.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_004153--1622374433495.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002510--1622325083779.npy: CRITICAL
+	* Wrong number of detections (expected: 2, got: 3)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002510--1622129548457.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003747--1622276205181.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003417--1622279301613.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002127--1622371970761.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002450--1622269488394.npy: OK
+	* Scores mismatch (expected: 0.640625, got: 0.65234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005373--1622192202673.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004334--1622215267229.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005373--1622382898930.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622249885664.npy: CRITICAL
+	* Wrong number of detections (expected: 6, got: 5)
+	* Scores mismatch (expected: 0.546875, got: 0.55859375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622376853441.npy: OK
+	* Scores mismatch (expected: 0.6171875, got: 0.62890625)
+	* Scores mismatch (expected: 0.6171875, got: 0.62890625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004539--1622166626721.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001278--1622203233507.npy: OK
+	* Scores mismatch (expected: 0.8125, got: 0.8046875)
+	* Scores mismatch (expected: 0.734375, got: 0.74609375)
+	* Scores mismatch (expected: 0.57421875, got: 0.59765625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002727--1622310246867.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003412--1622251636093.npy: OK
+	* Scores mismatch (expected: 0.71484375, got: 0.7265625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_007102--1622227266890.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_001151--1622355659143.npy: OK
+	* Scores mismatch (expected: 0.9453125, got: 0.93359375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003049--1622373524173.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.76953125)
+	* Scores mismatch (expected: 0.71484375, got: 0.7265625)
+	* Scores mismatch (expected: 0.70703125, got: 0.71484375)
+	* Scores mismatch (expected: 0.51171875, got: 0.5234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622242582105.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622283964693.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003701--1622283304626.npy: CRITICAL
+	* Scores mismatch (expected: 0.640625, got: 0.62890625)
+	* Scores mismatch (expected: 0.546875, got: 0.55859375)
+	* BBox IoU < 0.5 (IoU: 0.30978260869565216)
+	* Scores mismatch (expected: 0.53515625, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001896--1622135634690.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_000478--1622355084836.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_002613--1622353820098.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005403--1622362733433.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_001168--1622351184929.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_007102--1622295959681.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001644--1622325071596.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 4)
+	* Scores mismatch (expected: 0.59765625, got: 0.609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005178--1622169244032.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_004937--1622333278743.npy: OK
+	* Scores mismatch (expected: 0.83984375, got: 0.8046875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000734--1622364414657.npy: OK
+	* Scores mismatch (expected: 0.7890625, got: 0.78125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001453--1622364714403.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002727--1622257881091.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004076--1622226764211.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_001563--1622166248911.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_004937--1622351472479.npy: CRITICAL
+	* Wrong number of detections (expected: 3, got: 2)
+	* Scores mismatch (expected: 0.83984375, got: 0.765625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004076--1622255827164.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006904--1622310430253.npy: CRITICAL
+	* Wrong class (expected: person, got: car, IoU: 0.04717741935483871)
+	* BBox IoU < 0.5 (IoU: 0.04717741935483871)
+	* Scores mismatch (expected: 0.640625, got: 0.75390625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622178126558.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_002353--1622349275121.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005214--1622296804936.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003044--1622282774333.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 6)
+	* Scores mismatch (expected: 0.71484375, got: 0.7265625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002926--1622361256476.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002127--1622317745814.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003646--1622243027895.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622310944594.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002519--1622320934405.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001145--1622289966815.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001392--1622229491736.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003439--1622274732832.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002127--1622183477794.npy: OK
+	* Scores mismatch (expected: 0.75390625, got: 0.76171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003412--1622388247772.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003434--1622185350917.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.75390625)
+	* Scores mismatch (expected: 0.62890625, got: 0.6171875)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+	* Scores mismatch (expected: 0.51171875, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001145--1622301039689.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.75390625)
+	* Scores mismatch (expected: 0.67578125, got: 0.68359375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003804--1622209736896.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002510--1622286980862.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_007102--1622278582377.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622249938634.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000478--1622263017797.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000126--1622385058385.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003044--1622200425027.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 6)
+	* Scores mismatch (expected: 0.71484375, got: 0.7265625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003797--1622230106873.npy: OK
+	* Scores mismatch (expected: 0.75390625, got: 0.74609375)
+	* Scores mismatch (expected: 0.74609375, got: 0.734375)
+	* Scores mismatch (expected: 0.6640625, got: 0.65234375)
+	* Scores mismatch (expected: 0.6171875, got: 0.62890625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622386133722.npy: OK
+	* Scores mismatch (expected: 0.8046875, got: 0.796875)
+	* Scores mismatch (expected: 0.65234375, got: 0.6640625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003412--1622258166432.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622321142274.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001185--1622309642273.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_001399--1622140698032.npy: OK
+	* Scores mismatch (expected: 0.95703125, got: 0.93359375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006403--1622299215452.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003434--1622315334767.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.75390625)
+	* Scores mismatch (expected: 0.70703125, got: 0.6953125)
+	* Scores mismatch (expected: 0.67578125, got: 0.6640625)
+	* Scores mismatch (expected: 0.6171875, got: 0.609375)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000086--1622283507565.npy: OK
+	* Scores mismatch (expected: 0.8046875, got: 0.796875)
+	* Scores mismatch (expected: 0.51171875, got: 0.5)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001145--1622243535765.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2010_003171--1622332021220.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006874--1622312497033.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006156--1622207580831.npy: OK
+	* Wrong class (expected: backpack, got: handbag, IoU: 0.829691371930615)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000313--1622202390753.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002769--1622177123689.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622260478603.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001278--1622386960762.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622236929224.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006198--1622300804516.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 4)
+	* Scores mismatch (expected: 0.62890625, got: 0.6171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006047--1622205582364.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_004608--1622342137187.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002353--1622128848602.npy: CRITICAL
+	* Scores mismatch (expected: 0.83984375, got: 0.83203125)
+	* Scores mismatch (expected: 0.75390625, got: 0.76171875)
+	* Scores mismatch (expected: 0.74609375, got: 0.75390625)
+	* Scores mismatch (expected: 0.6953125, got: 0.68359375)
+	* Scores mismatch (expected: 0.6171875, got: 0.62890625)
+	* Wrong class (expected: dining table, got: person, IoU: 0.10916343025086596)
+	* BBox IoU < 0.5 (IoU: 0.10916343025086596)
+	* Scores mismatch (expected: 0.6171875, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004411--1622368876744.npy: OK
+	* Scores mismatch (expected: 0.76953125, got: 0.76171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003439--1622291328643.npy: OK
+	* Scores mismatch (expected: 0.75390625, got: 0.74609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000313--1622266206147.npy: OK
+	* Scores mismatch (expected: 0.57421875, got: 0.55859375)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001453--1622246002931.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622212334807.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000896--1622239930780.npy: OK
+	* Scores mismatch (expected: 0.7265625, got: 0.71484375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005403--1622319053528.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006198--1622190571368.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003439--1622318121986.npy: OK
+	* Scores mismatch (expected: 0.75390625, got: 0.74609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003646--1622191010422.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2010_006069--1622341837337.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_000101--1622277079443.npy: OK
+	* Scores mismatch (expected: 0.5859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005655--1622299449076.npy: OK
+	* Scores mismatch (expected: 0.74609375, got: 0.75390625)
+	* Scores mismatch (expected: 0.51171875, got: 0.5234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002620--1622360547028.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005214--1622205111053.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_004153--1622258588010.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001783--1622249100954.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_003049--1622338470330.npy: CRITICAL
+	* Wrong number of detections (expected: 4, got: 5)
+	* Scores mismatch (expected: 0.8046875, got: 0.83984375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001278--1622176189320.npy: OK
+	* Scores mismatch (expected: 0.734375, got: 0.74609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006284--1622375706001.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000478--1622200600452.npy: OK
+	* Scores mismatch (expected: 0.82421875, got: 0.8203125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005891--1622368741654.npy: OK
+	* Scores mismatch (expected: 0.71484375, got: 0.70703125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001470--1622304437334.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.75390625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004334--1622365483595.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001145--1622303281126.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_000101--1622140655665.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004076--1622372484635.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622216161936.npy: OK
+	* Scores mismatch (expected: 0.82421875, got: 0.83203125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_004004--1622263764402.npy: OK
+	* Scores mismatch (expected: 0.65234375, got: 0.6640625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000313--1622187788377.npy: OK
+	* Scores mismatch (expected: 0.5234375, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000896--1622305767807.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001981--1622322914109.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003049--1622311460477.npy: CRITICAL
+	* Wrong number of detections (expected: 8, got: 7)
+	* Scores mismatch (expected: 0.51171875, got: 0.5234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002769--1622174897608.npy: OK
+	* Scores mismatch (expected: 0.6171875, got: 0.62890625)
+	* Scores mismatch (expected: 0.5234375, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002769--1622264586797.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006798--1622199287408.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622280508689.npy: OK
+	* Scores mismatch (expected: 0.82421875, got: 0.83203125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001185--1622326221337.npy: OK
+	* Scores mismatch (expected: 0.76953125, got: 0.78125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006284--1622206847244.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004501--1622287557582.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004076--1622273958917.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001185--1622372939099.npy: OK
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003797--1622314638012.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006156--1622298402964.npy: CRITICAL
+	* Wrong number of detections (expected: 4, got: 5)
+	* Wrong class (expected: backpack, got: handbag, IoU: 0.8881632653061224)
+	* Scores mismatch (expected: 0.5859375, got: 0.59765625)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002613--1622259681510.npy: OK
+	* Scores mismatch (expected: 0.76171875, got: 0.76953125)
+	* Scores mismatch (expected: 0.53515625, got: 0.5234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622231540907.npy: OK
+	* Scores mismatch (expected: 0.609375, got: 0.6171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622306655385.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_005476--1622144135430.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002673--1622316919901.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622262306445.npy: OK
+	* Scores mismatch (expected: 0.65234375, got: 0.6640625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002027--1622223047039.npy: OK
+	* Scores mismatch (expected: 0.83203125, got: 0.82421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001705--1622192276416.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003434--1622134927916.npy: OK
+	* Scores mismatch (expected: 0.51171875, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005655--1622175726564.npy: OK
+	* Scores mismatch (expected: 0.74609375, got: 0.76953125)
+	* Scores mismatch (expected: 0.6640625, got: 0.67578125)
+	* Scores mismatch (expected: 0.57421875, got: 0.55859375)
+	* Scores mismatch (expected: 0.51171875, got: 0.5234375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002727--1622367848995.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001168--1622383943918.npy: CRITICAL
+	* Scores mismatch (expected: 0.76953125, got: 0.76171875)
+	* Scores mismatch (expected: 0.734375, got: 0.7265625)
+	* Scores mismatch (expected: 0.6640625, got: 0.65234375)
+	* Scores mismatch (expected: 0.65234375, got: 0.6640625)
+	* Scores mismatch (expected: 0.640625, got: 0.62890625)
+	* Scores mismatch (expected: 0.5859375, got: 0.57421875)
+	* BBox IoU < 0.5 (IoU: 0.02464150039357952)
+	* Scores mismatch (expected: 0.55859375, got: 0.62890625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006874--1622259244986.npy: OK
+	* Scores mismatch (expected: 0.8125, got: 0.8046875)
+	* Scores mismatch (expected: 0.5859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001278--1622178155250.npy: OK
+	* Scores mismatch (expected: 0.8125, got: 0.8046875)
+	* Scores mismatch (expected: 0.57421875, got: 0.55859375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002926--1622213337350.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622215186775.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003701--1622376132532.npy: CRITICAL
+	* BBox IoU < 0.5 (IoU: 0.30978260869565216)
+	* Scores mismatch (expected: 0.53515625, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003439--1622214498133.npy: OK
+	* Scores mismatch (expected: 0.75390625, got: 0.74609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622311190510.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004501--1622243686766.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002353--1622317893921.npy: CRITICAL
+	* BBox IoU < 0.5 (IoU: 0.41336131041018004)
+	* Scores mismatch (expected: 0.6171875, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006284--1622244299315.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001392--1622267259436.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_000078--1622341383155.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622297461993.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002981--1622190622682.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004501--1622212541797.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003417--1622290848151.npy: OK
+	* Scores mismatch (expected: 0.8125, got: 0.8046875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006904--1622127115854.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003646--1622256806318.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_003170--1622332970131.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622137821175.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001783--1622386659132.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622274183215.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622224860078.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006403--1622308393615.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001399--1622227835490.npy: OK
+	* Scores mismatch (expected: 0.83984375, got: 0.84375)
+	* Scores mismatch (expected: 0.796875, got: 0.7890625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622274206114.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003044--1622257331601.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622209134357.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004501--1622284876744.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005131--1622295384701.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004608--1622296549775.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2012_003646--1622335689993.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002127--1622328407139.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 6)
+	* Scores mismatch (expected: 0.75390625, got: 0.76171875)
+	* Scores mismatch (expected: 0.57421875, got: 0.5859375)
+	* Scores mismatch (expected: 0.5, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002078--1622360610883.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000814--1622299140925.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006156--1622318708543.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000004--1622252562340.npy: CRITICAL
+	* Wrong class (expected: suitcase, got: chair, IoU: 1.0)
+	* Scores mismatch (expected: 0.5, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002613--1622260528310.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622198314292.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622183253690.npy: CRITICAL
+	* Wrong number of detections (expected: 6, got: 5)
+	* Scores mismatch (expected: 0.640625, got: 0.62890625)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+	* Scores mismatch (expected: 0.546875, got: 0.53515625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003171--1622284053650.npy: OK
+	* Scores mismatch (expected: 0.55859375, got: 0.546875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_000921--1622249470200.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005969--1622317974178.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_006891--1622335712238.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002727--1622284040827.npy: OK
+	* Scores mismatch (expected: 0.6640625, got: 0.67578125)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_002161--1622169547965.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005214--1622185589836.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_002620--1622239301445.npy: OK
+	* Scores mismatch (expected: 0.7890625, got: 0.796875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001399--1622253380143.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_002127--1622353534813.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003170--1622216022253.npy: OK
+	* Scores mismatch (expected: 0.53515625, got: 0.51171875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_004076--1622194352071.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006874--1622273856880.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006403--1622260205220.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006156--1622129629698.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001145--1622379129128.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001981--1622138455976.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006047--1622209904621.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_005131--1622140406913.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001358--1622252290473.npy: OK
+	* Scores mismatch (expected: 0.59765625, got: 0.609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003049--1622215639482.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002519--1622359724254.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_003196--1622275149961.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003075--1622388332924.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_001358--1622278205492.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001644--1622204463170.npy: CRITICAL
+	* Wrong number of detections (expected: 5, got: 4)
+	* Scores mismatch (expected: 0.76953125, got: 0.76171875)
+	* Scores mismatch (expected: 0.59765625, got: 0.609375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005131--1622215504979.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_003417--1622301082425.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001453--1622359755748.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_000078--1622217574005.npy: OK
+	* Scores mismatch (expected: 0.6953125, got: 0.68359375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_006904--1622360480002.npy: CRITICAL
+	* Wrong class (expected: person, got: car, IoU: 0.04717741935483871)
+	* BBox IoU < 0.5 (IoU: 0.04717741935483871)
+	* Scores mismatch (expected: 0.640625, got: 0.75390625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_005131--1622299256192.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001783--1622290119177.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_004501--1622261684330.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2011_005476--1622141432878.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_002981--1622209563262.npy: OK
+	* Scores mismatch (expected: 0.84375, got: 0.83984375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006407--1622377115519.npy: OK
+sdc--ssd_mobilenet_v2_coco_quant_postprocess_edgetpu--2010_006069--1622344413846.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_005969--1622259099068.npy: CRITICAL
+	* Wrong number of detections (expected: 6, got: 5)
+	* Scores mismatch (expected: 0.70703125, got: 0.71484375)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_001563--1622200523725.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006156--1622378005018.npy: CRITICAL
+	* Wrong number of detections (expected: 4, got: 5)
+	* Scores mismatch (expected: 0.6171875, got: 0.609375)
+	* Scores mismatch (expected: 0.5859375, got: 0.59765625)
+	* Scores mismatch (expected: 0.55859375, got: 0.57421875)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_004153--1622384511289.npy: OK
+	* Scores mismatch (expected: 0.796875, got: 0.8046875)
+	* Scores mismatch (expected: 0.53515625, got: 0.546875)
+	* Scores mismatch (expected: 0.5234375, got: 0.53515625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2011_001453--1622184049642.npy: OK
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2010_006798--1622282215706.npy: OK
+	* Scores mismatch (expected: 0.67578125, got: 0.6640625)
+sdc--ssdlite_mobiledet_coco_qat_postprocess_edgetpu--2012_003646--1622257796058.npy: OK
+	* Scores mismatch (expected: 0.70703125, got: 0.6953125)
+	* Scores mismatch (expected: 0.546875, got: 0.53515625)
+	* Scores mismatch (expected: 0.5234375, got: 0.6953125)
+	* Scores mismatch (expected: 0.5234375, got: 0.51171875)
