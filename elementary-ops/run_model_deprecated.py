@@ -112,7 +112,7 @@ def main():
 
     # Setup log helper
     benchmarkName = "CoralConv2d"
-    benchmarkInfo = f"model_file: {model_file} input_file: {input_file} dft_golden_file: {dft_golden_file} iterations: {iterations}"
+    benchmarkInfo = f"model_file: {model_file} input_file: {input_image_file} dft_golden_file: {dft_golden_file} iterations: {iterations}"
     lh.start_log_file(benchmarkName, benchmarkInfo)
     lh.set_max_errors_iter(500)
     lh.set_iter_interval_print(1)

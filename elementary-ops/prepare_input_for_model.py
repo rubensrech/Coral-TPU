@@ -1,64 +1,49 @@
 #!/usr/bin/env python3
 
 import argparse
+from pathlib import Path
+from typing import Tuple
+
 import numpy as np
 from PIL import Image
-from pathlib import Path
 
-import sys
-sys.path.insert(1, './src')
-import util
-from util import Operation
+from src import util
+from src.util import Operation
 
 np.random.seed(0)
 
-INPUTS_DIR = f"{Path(__file__).parent}/inputs"
+def generate_from_input_image(model: str, out_ext: str, image_file: str):
+    op, input_shape, _, _ = util.parse_model_name(model)
 
-def get_input_image_name(image_filename):
-    return Path(image_filename).stem
-
-def get_output_name(model_file, out_ext, image_file=None):
-    if image_file is not None:
-        out_desc = get_input_image_name(image_file)
-    else:
-        out_desc = "rand"
-
-    op = util.get_op_from_model_name(model_file)
-    opStr = op.value
-    dims = util.get_dims_from_model_name(model_file)
-    dimsStr = "_".join(map(str, dims))
-    
-    return f"{INPUTS_DIR}/{out_desc}-{op.value}_{dimsStr}.{out_ext}"
-
-def generate_from_input_image(model_file, image_file, output_size, op, out_ext):
     img = Image.open(image_file)
-    img = img.resize(output_size[0:2])
+    img = img.resize(input_shape[1:3])
 
     if op == Operation.Conv2d:
         img = img.convert('L')
 
-    output_file = get_output_name(model_file, out_ext, image_file)
+    output_file = util.generate_input_filename(model, out_ext, image_file)
     output_arr = np.array(img)
-    output_shape = output_arr.shape
     
     if out_ext == "bmp":
         img.save(output_file)
     elif out_ext == "npy":
         np.save(output_file, output_arr)
 
-    print(f'Output image saved to `{output_file}` with dimensions {output_shape}')
+    return output_file, output_arr
+    
+def generate_random_input(model: str, out_ext: str):
+    input_shape, _ = util.get_dims_from_model_name(model)
+    output_size = input_shape[1:4]
 
-def generate_random_input(model_file, size, op, out_ext):
-    rand_input = np.random.randint(0, 255, size, dtype=np.uint8)
-    output_file = get_output_name(model_file, out_ext)
+    rand_input = np.random.randint(0, 255, output_size, dtype=np.uint8)
+    output_file = util.generate_input_filename(model, out_ext)
 
     if out_ext == "bmp":
         Image.fromarray(np.squeeze(rand_input)).save(output_file)
     elif out_ext == "npy":
         np.save(output_file, rand_input)
 
-    zero_count = np.sum(rand_input == 0)
-    print(f'Random input saved to `{output_file}` with dimensions {size} and {zero_count} zero element(s)')
+    return output_file, rand_input
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -75,16 +60,15 @@ def main():
     image_file = args.input
     npy_out = args.npy
 
-    op = util.get_op_from_model_name(model_file)
-    dims = util.get_dims_from_model_name(model_file)
-
-    output_size = dims[1:4]
     output_ext = "npy" if npy_out else "bmp"
 
-    if image_file is not None:
-        generate_from_input_image(model_file, image_file, output_size, op, output_ext)
+    if image_file:
+        out_file, out_arr = generate_from_input_image(model_file, output_ext, image_file)
     else:
-        generate_random_input(model_file, output_size, op, output_ext)
+        out_file, out_arr = generate_random_input(model_file, output_ext)
+
+    zero_count = np.sum(out_arr == 0)
+    print(f'Generated input saved to `{out_file}` with dimensions {out_arr.shape} and {zero_count}')
 
 if __name__ == "__main__":
     main()
