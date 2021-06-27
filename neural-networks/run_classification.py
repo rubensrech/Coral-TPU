@@ -106,7 +106,7 @@ def perform_inference(interpreter):
 def save_golden_output(interpreter, model_file, image_file):
     t0 = time.perf_counter()
 
-    golden_file = common.get_dft_golden_filename(model_file, image_file)
+    golden_file = common.get_golden_filename(model_file, image_file)
     scores = classification.get_scores(interpreter)
     save_output_to_file(scores, golden_file)
 
@@ -152,7 +152,7 @@ def check_output_against_golden(interpreter, golden_file):
 def save_sdc_output(interpreter, model_file, img_file):
     t0 = time.perf_counter()
 
-    sdc_out_file = common.get_dft_sdc_out_filename(model_file, img_file)
+    sdc_out_file = common.get_sdc_out_filename(model_file, img_file)
     scores = classification.get_scores(interpreter)
     save_output_to_file(scores, sdc_out_file)
 
@@ -203,7 +203,7 @@ def main():
             if save_golden:
                 save_golden_output(interpreter, model_file, image_file)
             else:
-                golden_file = common.get_dft_golden_filename(model_file, image_file)
+                golden_file = common.get_golden_filename(model_file, image_file)
                 errs_abv_thresh, errs_blw_thresh = check_output_against_golden(interpreter, golden_file)
                 errs_count = errs_abv_thresh + errs_blw_thresh
                 info_count = 0

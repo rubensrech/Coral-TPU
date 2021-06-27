@@ -107,7 +107,7 @@ def perform_inference(interpreter):
 def save_golden_output(interpreter, model_file, image_file, img_scale):
     t0 = time.perf_counter()
 
-    golden_file = common.get_dft_golden_filename(model_file, image_file)
+    golden_file = common.get_golden_filename(model_file, image_file)
     det_out = detection.get_objects(interpreter, nparray=True)
     model_in_size = common.input_size(interpreter)
     save_output_to_file(det_out, golden_file, model_in_size, img_scale)
@@ -176,7 +176,7 @@ def check_output_against_golden(interpreter, golden_file):
 def save_sdc_output(interpreter, model_file, img_file, img_scale):
     t0 = time.perf_counter()
 
-    sdc_out_file = common.get_dft_sdc_out_filename(model_file, img_file)
+    sdc_out_file = common.get_sdc_out_filename(model_file, img_file)
     raw_out = detection.get_detection_raw_output(interpreter)._asdict()
     model_in_size = common.input_size(interpreter)
     save_output_to_file(raw_out, sdc_out_file, model_in_size, img_scale)
@@ -229,7 +229,7 @@ def main():
             if save_golden:
                 save_golden_output(interpreter, model_file, image_file, image_scale)
             else:
-                golden_file = common.get_dft_golden_filename(model_file, image_file)
+                golden_file = common.get_golden_filename(model_file, image_file)
                 errs_abv_thresh, errs_blw_thresh = check_output_against_golden(interpreter, golden_file)
                 errs_count = errs_abv_thresh + errs_blw_thresh
                 info_count = 0

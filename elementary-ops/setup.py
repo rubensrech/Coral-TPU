@@ -55,7 +55,7 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-M', '--models', nargs="+", default=os.listdir(MODELS_DIR),
                         help='Path to model files (.tflite)')
-    parser.add_argument('-O', '--out_json', default='all-ops.json',
+    parser.add_argument('-O', '--out_json', default='all-convs.json',
                         help='Output JSON filename')
     args = parser.parse_args()
 

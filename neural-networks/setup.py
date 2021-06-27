@@ -1,129 +1,98 @@
 #!/usr/bin/env python3
 
-import re
+import os
 import json
-import subprocess
+import errno
+import argparse
 from pathlib import Path
+from typing import List
 
-# Better run with `sudo`:
-# > sudo ./setup.py
-
-################################################################
-# > Configuration
-# Add or comment benchmarks to be generated in the
-# correspondent task in the dictionary below
-
-BENCHMARKS_DESCRIPTORS = {
-    'detection': [
-        { 'model': 'ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite', 'inputs-dir': '/home/carol/radiation-benchmarks/data/VOC2012', 'nimages': 100 },
-        { 'model': 'ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite', 'inputs-dir': '/home/carol/radiation-benchmarks/data/VOC2012', 'nimages': 100 },
-        { 'model': 'ssd_mobilenet_v2_catsdogs_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/oxford-pets-100' },
-        { 'model': 'ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/oxford-pets-100' },
-        { 'model': 'ssd_mobilenet_v2_subcoco14_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/subcoco14' },
-        { 'model': 'ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/subcoco14' },
-    ],
-    'classification': [
-        { 'model': 'tfhub_tf2_resnet_50_imagenet_ptq_edgetpu.tflite', 'inputs-dir': '/home/carol/ILSVRC2012_val_100' },
-        { 'model': 'inception_v4_299_quant_edgetpu.tflite', 'inputs-dir': '/home/carol/ILSVRC2012_val_100' }
-    ],
-}
+from src.utils.common import MODELS_DIR, Model, ModelsManager, echo_run
 
 JSON_FILES_PATH = "/home/carol/radiation-benchmarks/scripts/json_files"
-JSON_PARAM = f"{JSON_FILES_PATH}/json_parameter"
 
-################################################################
+def sudo_user():
+    try:
+        os.mkdir('/etc/test')
+        os.rmdir('/etc/test')
+        return True
+    except IOError as e:
+        return False
 
-# Paths
+def setup_benchmarks(models: List[Model], skip_gold_gen=False):
+    generated_benchmarks_json_map = {}
 
-INSTALL_DIR = Path(__file__).parent.absolute()
-MODELS_DIR = f"{INSTALL_DIR}/models"
-INPUTS_DIR = f"{INSTALL_DIR}/inputs"
+    for model in models:
+        print(f"STARTING SETUP FOR MODEL `{model.name}`")
 
-# Util functions
+        task_script_full_path = model.task.script_file
+        model_file_full_path = model.file
 
-def echo_run(args):
-    if type(args) == str:
-        args = args.split(' ')
-    p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = p.stdout.decode()
-    if output: print(output)
-    return output
+        # Prepating dataset
+        if not model.dataset.input_images_file_exists():
+            print(f"> PREPARING DATASET `{model.dataset.name}` ({model.dataset.images_dir})")
+            input_images_file_full_path, nimages = model.dataset.create_input_images_file()
+            print(f">> Dataset contains {nimages} images")
+        else:
+            print(f"> SKIPPING DATASET PREPARATION: Input images file for dataset `{model.dataset.name}` already exists")
+            input_images_file_full_path = model.dataset.input_images_file
 
-def get_full_path(filename):
-    return Path(filename).absolute()
+        # Generate golden
+        if not skip_gold_gen:
+            print(f"> GENERATING GOLDEN FILES")
+            echo_run(f"sudo python3 {task_script_full_path} --model {model_file_full_path} --input {input_images_file_full_path} --save-golden")
 
-def get_script_for_task(task):
-    return "run_" + task + ".py"
-
-def get_path_to_json_file_for_task(task):
-    return f"{JSON_FILES_PATH}/{task}.json"
-
-# Main functions
-
-def setup_benchmarks(benchmark_descriptors):
-    generated_benchmarks_grouped_by_task = {}
-
-    for task in benchmark_descriptors:
-        generated_benchmarks_grouped_by_task[task] = {
-            'benchmarks_data': [],
-            'json_file': get_path_to_json_file_for_task(task)
+        # Build JSON data
+        benchmark_json_data = {
+            "exec": f"sudo python3 {task_script_full_path} --model {model_file_full_path} --input {input_images_file_full_path} --iterations 1000000000",
+            "killcmd": f"pkill -9 -f {os.path.basename(task_script_full_path)}"
         }
 
-        task_script = get_script_for_task(task)
+        generated_benchmarks_json_map[model] = benchmark_json_data
 
-        for benchmark in benchmark_descriptors[task]:
-            # Create input images list
-            nimages = benchmark.get('nimages', None)
-            inputs_dir = benchmark['inputs-dir']
-            print(f"GENERATING INPUT IMAGES LIST FROM `{inputs_dir}`")
-            if nimages is not None:
-                gen_in_out = echo_run(f"python3 create_inputs_list.py {inputs_dir} -n {nimages}")
-            else:
-                gen_in_out = echo_run(f"python3 create_inputs_list.py {inputs_dir}")
-            path_to_input = re.compile('`(.*)`').findall(gen_in_out)[0]
-            full_path_to_input = get_full_path(path_to_input)
-
-            # Generate golden
-            model_filename = benchmark['model']
-            full_path_to_model = MODELS_DIR + '/' + model_filename
-            print(f"GENERATING GOLDEN FOR MODEL `{model_filename}`")
-            echo_run(f"sudo python3 {task_script} --model {full_path_to_model} --input {full_path_to_input} --save-golden")
-
-            # Build JSON data
-            full_path_to_script = get_full_path(task_script)
-            benchmark_exec_cmd = f"sudo python3 {full_path_to_script} --model {full_path_to_model} --input {full_path_to_input} --iterations 1000000000"
-            benchmark_kill_cmd = f"pkill -9 -f {task_script}"
-            benchmark_json_data = { "exec": benchmark_exec_cmd, "killcmd": benchmark_kill_cmd }
-
-            generated_benchmarks_grouped_by_task[task]['benchmarks_data'].append(benchmark_json_data)
-
-        # Write benchmarks to JSON file
-        task_json_file = generated_benchmarks_grouped_by_task[task]['json_file']
-        task_benchmarks_data = generated_benchmarks_grouped_by_task[task]['benchmarks_data']
-
-        with open(task_json_file, 'w') as f:
-            json.dump(task_benchmarks_data, f, indent=4)
-
-    return generated_benchmarks_grouped_by_task
-
-def update_json_param(generated_benchmarks_grouped_by_task):
-    generated_json_files = list(map(lambda t: generated_benchmarks_grouped_by_task[t]['json_file'], generated_benchmarks_grouped_by_task))
-
-    with open(JSON_PARAM, 'w') as f:
-        for json_file in generated_json_files:
-            f.write(json_file + '\n')
+    return generated_benchmarks_json_map
 
 def main():
-    generated_benchmarks_grouped_by_task = setup_benchmarks(BENCHMARKS_DESCRIPTORS)
-    update_json_param(generated_benchmarks_grouped_by_task)
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-M', '--models', nargs="+", default=os.listdir(MODELS_DIR),
+                        help='Path to model files (.tflite)')
+    parser.add_argument('-O', '--out_json', default='all-NNs.json',
+                        help='Output JSON filename')
+    parser.add_argument('--skip_golds', required=False, action='store_true', default=False,
+                        help='Wether the golden output generation should be skipped')
+    args = parser.parse_args()
 
-    print("--------------------- SUMMARY ---------------------")
-    for task in generated_benchmarks_grouped_by_task:
-        nbenchmarks = len(generated_benchmarks_grouped_by_task[task]['benchmarks_data'])
-        print(f"{task.upper()}: {nbenchmarks} BENCHMARKS GENERATED")
-        print(json.dumps(BENCHMARKS_DESCRIPTORS[task], indent=4))
+    if not sudo_user():
+        print("You must run this script using `sudo`")
+        exit(-1)
 
-    print(f"JSON PARAMETER UPDATED ({JSON_PARAM})")
+    model_names = list(map(lambda model_file: Path(model_file).stem, args.models))
+    models = list(map(ModelsManager.get_by_name, model_names))
+
+    generated_benchmarks_json_map = setup_benchmarks(models, args.skip_golds)
+
+    # Write JSON files
+    out_json_filename = args.out_json if args.out_json.endswith('.json') else args.out_json + '.json'
+    out_json_full_path = os.path.join(JSON_FILES_PATH, out_json_filename)
+
+    with open(out_json_full_path, 'w') as outfile:
+        json_data = list(generated_benchmarks_json_map.values())
+        json.dump(json_data, outfile, indent=4)
+        outfile.close()
+
+        models_info = list(map(lambda model: model.describe(), generated_benchmarks_json_map.keys()))
+        print(f"{len(models_info)} BENCHMARKS GENERATED:")
+        print(json.dumps(models_info, indent=4))
+        print(f"GENERATED BENCHMARKS JSON WRITTEN TO `{out_json_full_path}`")
+
+
+    json_param_filename = Path(out_json_filename).stem + '-param'
+    json_param_full_path = os.path.join(JSON_FILES_PATH, json_param_filename)
+
+    with open(json_param_full_path, 'w') as f:
+        f.write(out_json_full_path)
+        f.close()
+        print(f"JSON PARAMETER WRITTEN TO `{json_param_full_path}`")
 
 if __name__ == "__main__":
     main()

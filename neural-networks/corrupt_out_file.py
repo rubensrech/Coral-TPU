@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-import numpy as np
+import time
 import argparse
+import numpy as np
 from src.utils import common
 
 ORIG_SUFFIX = ".orig"
@@ -12,9 +13,9 @@ def corrupt_out_file(out_file, ncorruptions=1):
     os.system(f'cp -n {out_file} {out_file + ORIG_SUFFIX}')
 
     out_data = common.load_tensors_from_file(out_file)
-    if 'detection_output' in out_data:
+    if 'detection_output' in out_data: # Detection
         tensorName = 'detection_output'
-    elif 'scores' in out_data:
+    elif 'scores' in out_data: # Classification
         tensorName = 'scores'
     else:
         raise Exception("Invalid file")
@@ -41,13 +42,16 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('out_file', help='Path to the file to be corrupted')
     parser.add_argument('-n', '--ncorruptions', type=int, default=1, help='Number of corruptions')
-    parser.add_argument('-R', '--revert', action='store_true', help='Revert back to original file')
+    parser.add_argument('-r', '--revert_delay_ms', type=int, default=500, help='The delay, in ms, before undoing the corruption and reverting back to original file')
     args = parser.parse_args()
 
-    if args.revert:
+    revert_delay_seconds = args.revert_delay_ms / 1000
+
+    corrupt_out_file(args.out_file, args.ncorruptions)
+
+    if revert_delay_seconds > 0:
+        time.sleep(revert_delay_seconds)
         revert(args.out_file)
-    else:
-        corrupt_out_file(args.out_file, args.ncorruptions)
 
 if __name__ == '__main__':
     main()

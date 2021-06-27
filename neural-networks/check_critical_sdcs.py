@@ -2,14 +2,14 @@
 
 import os
 import argparse
-from typing import List
-from enum import Enum
 from pathlib import Path
+from typing import List
 
 from src.utils.logger import Logger
 Logger.setLevel(Logger.Level.INFO)
 
 from src.utils import common
+from src.utils.common import ModelTask, ModelsManager
 from src.utils.detection import DetectionRawOutput, BBox, match_detections
 from src.utils.classification import get_classes_from_scores
 
@@ -62,48 +62,23 @@ class WrongScorePredictionError(PredictionError):
     def __init__(self, expected: float, got: float) -> None:
         super().__init__(f"Scores mismatch (expected: {expected}, got: {got})", is_critical=False)
 
-class ModelTask(Enum):
-    Detection = "DETECTION"
-    Classification = "CLASSIFICATION"
-
-class Model:
-    def __init__(self, name: str, task: ModelTask, labels_name: str) -> None:
-        self.name = name
-        self.model_file = os.path.join(common.MODELS_DIR, name + ".tflite")
-        self.task = task
-        self.labels_file = os.path.join(common.LABELS_DIR, labels_name + "_labels.txt")
-
+class ModelSDCsStats():
+    def __init__(self) -> None:
+        # General stats
         self.total_sdc_outputs = 0
         self.critical_sdc_outputs = 0
         self.ignored_sdc_outputs = 0
 
+        # Prediction errors stats
         self.total_prediction_errors = 0
         self.prediction_errors_by_type = { err_class.__name__: 0 for err_class in PredictionError.__subclasses__() }
 
-class ModelsManager:
-    MODELS_LIST = [
-        # Detection
-        Model('ssd_mobilenet_v2_coco_quant_postprocess_edgetpu', ModelTask.Detection, 'coco'),
-        Model('ssdlite_mobiledet_coco_qat_postprocess_edgetpu', ModelTask.Detection, 'coco'),
-        Model('ssd_mobilenet_v2_catsdogs_quant_edgetpu', ModelTask.Detection, 'pets'),
-        Model('ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu', ModelTask.Detection, 'pets'),
-        Model('ssd_mobilenet_v2_subcoco14_quant_edgetpu', ModelTask.Detection, 'subcoco'),
-        Model('ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu', ModelTask.Detection, 'subcoco'),
-        # Classification
-        Model('tfhub_tf2_resnet_50_imagenet_ptq_edgetpu', ModelTask.Classification, 'imagenet'),
-        Model('inception_v4_299_quant_edgetpu', ModelTask.Classification, 'imagenet'),
-    ]
-
-    MODELS_MAP = { m.name: m for m in MODELS_LIST }
-    MODEL_LABELS_MAP = { m.name: common.read_label_file(m.labels_file) for m in MODELS_LIST }
-    
-    @staticmethod
-    def get_model(model_name):
-        return ModelsManager.MODELS_MAP.get(model_name)
+class ModelsSDCsStatsManager():
+    MODELS_SDCs_STATS_MAP = { m.name: ModelSDCsStats() for m in ModelsManager.MODELS_LIST }
 
     @staticmethod
-    def get_model_labels(model_name):
-        return ModelsManager.MODEL_LABELS_MAP.get(model_name)
+    def get_stats_by_model_name(model_name: str):
+        return ModelsSDCsStatsManager.MODELS_SDCs_STATS_MAP.get(model_name)
 
 class SDCOutput:
     SCORE_THRESHOLD = 0.5
@@ -125,7 +100,6 @@ class SDCOutput:
 
         self.prediction_errors: List[PredictionError] = []
         self.is_critical: bool = False
-        self.model: Model = None
         self.task: ModelTask = None
 
         self.analyze()
@@ -144,7 +118,7 @@ class SDCOutput:
 
     def prepare_for_analysis(self):
         self.model_name, self.image_name, self.timestamp = common.parse_sdc_out_filename(self.file)
-        self.gold_file = common.get_dft_golden_filename(self.model_name, self.image_name)
+        self.gold_file = common.get_golden_filename(self.model_name, self.image_name)
 
         try:
             gold_data = common.load_tensors_from_file(self.gold_file)
@@ -154,8 +128,7 @@ class SDCOutput:
         except Exception as ex:
             raise CorruptedFileException(ex)
 
-        self.model = ModelsManager.get_model(self.model_name)
-        self.task = self.model.task
+        self.task = ModelsManager.get_by_name(self.model_name).task
         labels = ModelsManager.get_model_labels(self.model_name)
 
         return gold_data, sdc_data, labels
@@ -284,19 +257,21 @@ def main():
                     sdc = SDCOutput(sdc_file)
                     sdc.print(file=full_out_file)
 
-                    sdc.model.total_sdc_outputs += 1
+                    model_stats = ModelsSDCsStatsManager.get_stats_by_model_name(sdc.model_name)
+
+                    model_stats.total_sdc_outputs += 1
                     if sdc.is_critical:
-                        sdc.model.critical_sdc_outputs += 1
-                        sdc.model.total_prediction_errors += len(sdc.prediction_errors)
+                        model_stats.critical_sdc_outputs += 1
+                        model_stats.total_prediction_errors += len(sdc.prediction_errors)
                         for err in sdc.prediction_errors:
-                            sdc.model.prediction_errors_by_type[err.type] += 1
+                            model_stats.prediction_errors_by_type[err.type] += 1
 
                 except NotSDCOutputFileException:
                     Logger.info(f"Ignoring not SDC file: {filename}")
                 except SDCOutputException as ex:
                     Logger.info(f"Ignoring SDC file: {filename} - {ex}")
-                    if sdc and sdc.model:
-                        sdc.model.ignored_sdc_outputs += 1
+                    if model_stats:
+                        model_stats.ignored_sdc_outputs += 1
                 except Exception as ex:
                     raise ex
             
@@ -316,20 +291,21 @@ def main():
         print_stdout_and_file(">  MODELS", summary_out_file)
         print_stdout_and_file("", summary_out_file)
 
-        for model in ModelsManager.MODELS_LIST:
-            print_stdout_and_file(f"{model.name}:", summary_out_file, indent_level=1)
+        for model_name, stats in ModelsSDCsStatsManager.MODELS_SDCs_STATS_MAP.items():
+            print_stdout_and_file(f"{model_name}:", summary_out_file, indent_level=1)
 
-            total = model.total_sdc_outputs
-            criticals = model.critical_sdc_outputs
-            ignored = model.ignored_sdc_outputs
-            total_pred_errs = model.total_prediction_errors
+            model_task = ModelsManager.get_by_name(model_name).task
+            total = stats.total_sdc_outputs
+            criticals = stats.critical_sdc_outputs
+            ignored = stats.ignored_sdc_outputs
+            total_pred_errs = stats.total_prediction_errors
 
-            print_stdout_and_file("- Task: {:s}".format(model.task.value), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Task: {:s}".format(model_task.value), summary_out_file, indent_level=2)
             print_stdout_and_file("- Total SDC outputs*: {:d}".format(total), summary_out_file, indent_level=2)
             print_stdout_and_file("- Critical SDC outputs: {:d} ({:.2f} %)".format(criticals, percent(criticals, total)), summary_out_file, indent_level=2)
             print_stdout_and_file("- Ignored SDC outputs: {:d} ({:.2f} %)".format(ignored, percent(ignored, total)), summary_out_file, indent_level=2)
             print_stdout_and_file("- Total prediction errors: {:d}".format(total_pred_errs), summary_out_file, indent_level=2)
-            for err_type, err_count in sorted(model.prediction_errors_by_type.items(), key=lambda item: item[1], reverse=True):
+            for err_type, err_count in sorted(stats.prediction_errors_by_type.items(), key=lambda item: item[1], reverse=True):
                 err_name = err_type.rstrip('PredictionError')
                 print_stdout_and_file("- {:s}: {:d} ({:.2f} %)".format(err_name, err_count, percent(err_count, total_pred_errs)), summary_out_file, indent_level=3)
             print_stdout_and_file("", summary_out_file)
