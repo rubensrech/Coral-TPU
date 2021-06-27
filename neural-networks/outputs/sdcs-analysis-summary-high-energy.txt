@@ -8,89 +8,89 @@
 
   ssd_mobilenet_v2_coco_quant_postprocess_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 2996
-    - Critical SDCs: 61 (2.04 %)
-    - Ignored SDCs: 1 (0.03 %)
-    - Total SDCs errors: 121
-      - WrongDetsNumbe: 57 (47.11 %)
+    - Total SDC outputs*: 2996
+    - Critical SDC outputs: 61 (2.04 %)
+    - Ignored SDC outputs: 1 (0.03 %)
+    - Total prediction errors: 121
+      - WrongDetsNumb: 57 (47.11 %)
+      - WrongS: 48 (39.67 %)
       - BBox: 8 (6.61 %)
       - WrongClass: 8 (6.61 %)
-      - WrongScore: 48 (39.67 %)
 
   ssdlite_mobiledet_coco_qat_postprocess_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 2325
-    - Critical SDCs: 237 (10.19 %)
-    - Ignored SDCs: 4 (0.17 %)
-    - Total SDCs errors: 684
-      - WrongDetsNumbe: 139 (20.32 %)
+    - Total SDC outputs*: 2325
+    - Critical SDC outputs: 237 (10.19 %)
+    - Ignored SDC outputs: 4 (0.17 %)
+    - Total prediction errors: 684
+      - WrongS: 408 (59.65 %)
+      - WrongDetsNumb: 139 (20.32 %)
       - BBox: 96 (14.04 %)
       - WrongClass: 41 (5.99 %)
-      - WrongScore: 408 (59.65 %)
 
   ssd_mobilenet_v2_catsdogs_quant_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 1026
-    - Critical SDCs: 30 (2.92 %)
-    - Ignored SDCs: 2 (0.19 %)
-    - Total SDCs errors: 52
-      - WrongDetsNumbe: 30 (57.69 %)
-      - BBox: 0 (0.00 %)
+    - Total SDC outputs*: 1026
+    - Critical SDC outputs: 30 (2.92 %)
+    - Ignored SDC outputs: 2 (0.19 %)
+    - Total prediction errors: 52
+      - WrongDetsNumb: 30 (57.69 %)
+      - WrongS: 13 (25.00 %)
       - WrongClass: 9 (17.31 %)
-      - WrongScore: 13 (25.00 %)
+      - BBox: 0 (0.00 %)
 
   ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 1167
-    - Critical SDCs: 12 (1.03 %)
-    - Ignored SDCs: 1 (0.09 %)
-    - Total SDCs errors: 16
-      - WrongDetsNumbe: 11 (68.75 %)
+    - Total SDC outputs*: 1167
+    - Critical SDC outputs: 12 (1.03 %)
+    - Ignored SDC outputs: 1 (0.09 %)
+    - Total prediction errors: 16
+      - WrongDetsNumb: 11 (68.75 %)
+      - WrongS: 3 (18.75 %)
       - BBox: 1 (6.25 %)
       - WrongClass: 1 (6.25 %)
-      - WrongScore: 3 (18.75 %)
 
   ssd_mobilenet_v2_subcoco14_quant_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 134
-    - Critical SDCs: 5 (3.73 %)
-    - Ignored SDCs: 0 (0.00 %)
-    - Total SDCs errors: 15
-      - WrongDetsNumbe: 5 (33.33 %)
+    - Total SDC outputs*: 134
+    - Critical SDC outputs: 5 (3.73 %)
+    - Ignored SDC outputs: 0 (0.00 %)
+    - Total prediction errors: 15
+      - WrongS: 9 (60.00 %)
+      - WrongDetsNumb: 5 (33.33 %)
       - BBox: 1 (6.67 %)
       - WrongClass: 0 (0.00 %)
-      - WrongScore: 9 (60.00 %)
 
   ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu:
     - Task: DETECTION
-    - Total SDCs: 184
-    - Critical SDCs: 8 (4.35 %)
-    - Ignored SDCs: 1 (0.54 %)
-    - Total SDCs errors: 25
-      - WrongDetsNumbe: 5 (20.00 %)
+    - Total SDC outputs*: 184
+    - Critical SDC outputs: 8 (4.35 %)
+    - Ignored SDC outputs: 1 (0.54 %)
+    - Total prediction errors: 25
+      - WrongS: 15 (60.00 %)
+      - WrongDetsNumb: 5 (20.00 %)
       - BBox: 3 (12.00 %)
       - WrongClass: 2 (8.00 %)
-      - WrongScore: 15 (60.00 %)
 
   tfhub_tf2_resnet_50_imagenet_ptq_edgetpu:
     - Task: CLASSIFICATION
-    - Total SDCs: 2189
-    - Critical SDCs: 6 (0.27 %)
-    - Ignored SDCs: 6 (0.27 %)
-    - Total SDCs errors: 12
-      - WrongDetsNumbe: 0 (0.00 %)
-      - BBox: 0 (0.00 %)
+    - Total SDC outputs*: 2189
+    - Critical SDC outputs: 6 (0.27 %)
+    - Ignored SDC outputs: 6 (0.27 %)
+    - Total prediction errors: 12
       - WrongClass: 6 (50.00 %)
-      - WrongScore: 6 (50.00 %)
+      - WrongS: 6 (50.00 %)
+      - WrongDetsNumb: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
 
   inception_v4_299_quant_edgetpu:
     - Task: CLASSIFICATION
-    - Total SDCs: 3313
-    - Critical SDCs: 4 (0.12 %)
-    - Ignored SDCs: 3 (0.09 %)
-    - Total SDCs errors: 8
-      - WrongDetsNumbe: 0 (0.00 %)
-      - BBox: 0 (0.00 %)
+    - Total SDC outputs*: 3313
+    - Critical SDC outputs: 4 (0.12 %)
+    - Ignored SDC outputs: 3 (0.09 %)
+    - Total prediction errors: 8
       - WrongClass: 4 (50.00 %)
-      - WrongScore: 4 (50.00 %)
+      - WrongS: 4 (50.00 %)
+      - WrongDetsNumb: 0 (0.00 %)
+      - BBox: 0 (0.00 %)
 

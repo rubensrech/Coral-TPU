@@ -1,4 +1,5 @@
-import io
+#!/usr/bin/env python3
+
 import os
 import argparse
 from typing import List
@@ -32,7 +33,7 @@ class ImageScaleMismatchException(SDCOutputException): pass
 class InputSizeMismatchException(SDCOutputException): pass
 class GoldenFileNotFoundException(SDCOutputException): pass
 
-class SDCError:
+class PredictionError:
     def __init__(self, msg: str, is_critical = False) -> None:
         self.is_critical = is_critical
         self.msg = msg
@@ -41,23 +42,23 @@ class SDCError:
     def type(self):
         return self.__class__.__name__
 
-class WrongDetsNumberSDCError(SDCError):
+class WrongDetsNumberPredictionError(PredictionError):
     def __init__(self, expected: int, got: int) -> None:
         super().__init__(f"Wrong number of detections (expected: {expected}, got: {got})", is_critical=True)
 
-class BBoxSDCError(SDCError):
+class BBoxPredictionError(PredictionError):
     def __init__(self, iou: float) -> None:
         assert iou < BBOX_MIN_IOU
         super().__init__(f"BBox IoU < {BBOX_MIN_IOU} (IoU: {iou})", is_critical=True)
 
-class WrongClassSDCError(SDCError):
+class WrongClassPredictionError(PredictionError):
     def __init__(self, expected: str, got: str, iou: float=None, is_critical=True) -> None:
         if iou:
             super().__init__(f"Wrong class (expected: {expected}, got: {got}, IoU: {iou})", is_critical=iou >= MATCH_BBOX_IOU)
         else:
             super().__init__(f"Wrong class (expected: {expected}, got: {got})", is_critical=is_critical)
 
-class WrongScoreSDCError(SDCError):
+class WrongScorePredictionError(PredictionError):
     def __init__(self, expected: float, got: float) -> None:
         super().__init__(f"Scores mismatch (expected: {expected}, got: {got})", is_critical=False)
 
@@ -72,12 +73,12 @@ class Model:
         self.task = task
         self.labels_file = os.path.join(common.LABELS_DIR, labels_name + "_labels.txt")
 
-        self.total_sdcs = 0
-        self.critical_sdcs = 0
-        self.ignored_sdcs = 0
+        self.total_sdc_outputs = 0
+        self.critical_sdc_outputs = 0
+        self.ignored_sdc_outputs = 0
 
-        self.total_sdc_errors = 0
-        self.errors_by_type = { err_class.__name__: 0 for err_class in SDCError.__subclasses__() }
+        self.total_prediction_errors = 0
+        self.prediction_errors_by_type = { err_class.__name__: 0 for err_class in PredictionError.__subclasses__() }
 
 class ModelsManager:
     MODELS_LIST = [
@@ -122,16 +123,16 @@ class SDCOutput:
         self.timestamp: int = None
         self.gold_file: str = None
 
-        self.errors: List[SDCError] = []
+        self.prediction_errors: List[PredictionError] = []
         self.is_critical: bool = False
-        self.model = Model = None
+        self.model: Model = None
         self.task: ModelTask = None
 
         self.analyze()
 
     def __str__(self) -> str:
         lines = [f"{os.path.basename(self.file)}: {'CRITICAL' if self.is_critical else 'OK'}"]
-        for err in self.errors:
+        for err in self.prediction_errors:
             lines.append(f"\t* {err.msg}" )
         return '\n'.join(lines)
 
@@ -173,8 +174,8 @@ class SDCOutput:
             # Stop analysis on first critical error
             pass        
 
-    def add_error(self, error: SDCError):
-        self.errors.append(error)
+    def add_prediction_error(self, error: PredictionError):
+        self.prediction_errors.append(error)
         if error.is_critical:
             self.is_critical = True
             if RETURN_WHEN_CRITICAL:
@@ -208,7 +209,7 @@ class SDCOutput:
         n_gold_dets = len(gold_dets)
         n_sdc_dets = len(sdc_dets)
         if n_gold_dets != n_sdc_dets:
-            self.add_error(WrongDetsNumberSDCError(expected=n_gold_dets, got=n_sdc_dets))
+            self.add_prediction_error(WrongDetsNumberPredictionError(expected=n_gold_dets, got=n_sdc_dets))
 
         det_pairs = match_detections(gold_dets, sdc_dets) if MATCH_BBOX_IOU else \
                         [(gold_dets[i], sdc_dets[i], BBox.iou(gold_dets[i].bbox, sdc_dets[i].bbox)) for i in range(min(n_gold_dets, len(n_sdc_dets)))]
@@ -218,13 +219,13 @@ class SDCOutput:
             if sdc_det.id != gold_det.id:
                 sdc_det_class = labels.get(sdc_det.id)
                 gold_det_class = labels.get(gold_det.id)
-                self.add_error(WrongClassSDCError(gold_det_class, sdc_det_class, iou=iou))
+                self.add_prediction_error(WrongClassPredictionError(gold_det_class, sdc_det_class, iou=iou))
 
             if iou < BBOX_MIN_IOU:
-                self.add_error(BBoxSDCError(iou))
+                self.add_prediction_error(BBoxPredictionError(iou))
 
             if sdc_det.score != gold_det.score:
-                self.add_error(WrongScoreSDCError(gold_det.score, sdc_det.score))
+                self.add_prediction_error(WrongScorePredictionError(gold_det.score, sdc_det.score))
 
             # draw_detections_and_show(self.image_name, gold_dets, labels)
             # draw_detections_and_show(self.image_name, sdc_dets, labels, color='red')
@@ -243,10 +244,10 @@ class SDCOutput:
                 gold_class_label = labels.get(gold_class.id)
                 sdc_class_label = labels.get(sdc_class.id)
                 critical = i == 0 # Critical only if top 1 class
-                self.add_error(WrongClassSDCError(gold_class_label, sdc_class_label, is_critical=critical))
+                self.add_prediction_error(WrongClassPredictionError(gold_class_label, sdc_class_label, is_critical=critical))
 
             if gold_class.score != sdc_class.score:
-                self.add_error(WrongScoreSDCError(gold_class.score, sdc_class.score))
+                self.add_prediction_error(WrongScorePredictionError(gold_class.score, sdc_class.score))
 
 def print_stdout_and_file(string, file, indent_level=0):
     content = '  ' * indent_level + string
@@ -283,19 +284,19 @@ def main():
                     sdc = SDCOutput(sdc_file)
                     sdc.print(file=full_out_file)
 
-                    sdc.model.total_sdcs += 1
+                    sdc.model.total_sdc_outputs += 1
                     if sdc.is_critical:
-                        sdc.model.critical_sdcs += 1
-                        sdc.model.total_sdc_errors += len(sdc.errors)
-                        for err in sdc.errors:
-                            sdc.model.errors_by_type[err.type] += 1
+                        sdc.model.critical_sdc_outputs += 1
+                        sdc.model.total_prediction_errors += len(sdc.prediction_errors)
+                        for err in sdc.prediction_errors:
+                            sdc.model.prediction_errors_by_type[err.type] += 1
 
                 except NotSDCOutputFileException:
                     Logger.info(f"Ignoring not SDC file: {filename}")
                 except SDCOutputException as ex:
                     Logger.info(f"Ignoring SDC file: {filename} - {ex}")
                     if sdc and sdc.model:
-                        sdc.model.ignored_sdcs += 1
+                        sdc.model.ignored_sdc_outputs += 1
                 except Exception as ex:
                     raise ex
             
@@ -315,19 +316,19 @@ def main():
         for model in ModelsManager.MODELS_LIST:
             print_stdout_and_file(f"{model.name}:", summary_out_file, indent_level=1)
 
-            total = model.total_sdcs
-            criticals = model.critical_sdcs
-            ignored = model.ignored_sdcs
-            total_errs = model.total_sdc_errors
+            total = model.total_sdc_outputs
+            criticals = model.critical_sdc_outputs
+            ignored = model.ignored_sdc_outputs
+            total_pred_errs = model.total_prediction_errors
 
             print_stdout_and_file("- Task: {:s}".format(model.task.value), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Total SDCs: {:d}".format(total), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Critical SDCs: {:d} ({:.2f} %)".format(criticals, percent(criticals, total)), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Ignored SDCs: {:d} ({:.2f} %)".format(ignored, percent(ignored, total)), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Total SDCs errors: {:d}".format(total_errs), summary_out_file, indent_level=2)
-            for err_type, err_count in model.errors_by_type.items():
-                err_name = err_type.rstrip('SDCError')
-                print_stdout_and_file("- {:s}: {:d} ({:.2f} %)".format(err_name, err_count, percent(err_count, total_errs)), summary_out_file, indent_level=3)
+            print_stdout_and_file("- Total SDC outputs*: {:d}".format(total), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Critical SDC outputs: {:d} ({:.2f} %)".format(criticals, percent(criticals, total)), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Ignored SDC outputs: {:d} ({:.2f} %)".format(ignored, percent(ignored, total)), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Total prediction errors: {:d}".format(total_pred_errs), summary_out_file, indent_level=2)
+            for err_type, err_count in sorted(model.prediction_errors_by_type.items(), key=lambda item: item[1], reverse=True):
+                err_name = err_type.rstrip('PredictionError')
+                print_stdout_and_file("- {:s}: {:d} ({:.2f} %)".format(err_name, err_count, percent(err_count, total_pred_errs)), summary_out_file, indent_level=3)
             print_stdout_and_file("", summary_out_file)
 
         summary_out_file.close()
