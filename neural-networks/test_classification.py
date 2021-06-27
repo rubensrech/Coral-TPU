@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
+
 import time
 import argparse
 from pathlib import Path
 
 from PIL import Image
-from PIL import ImageDraw
 
 from src.utils import common
 from src.utils import classification
