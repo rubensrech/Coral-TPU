@@ -4,6 +4,7 @@
 *.jpg
 *.bmp
 *.npy
+*.log
 schema.fbs
 
 __pycache__
