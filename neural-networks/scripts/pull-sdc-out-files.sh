@@ -1,6 +1,6 @@
 PERIOD_IN_MINS=5
 
-cd outputs/
+cd ../outputs/
 
 while true;
 do
