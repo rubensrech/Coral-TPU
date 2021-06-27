@@ -308,6 +308,9 @@ def main():
 
         print_stdout_and_file(" - Full analysis output file: {:s}".format(analysis_full_out_file), summary_out_file)
         print_stdout_and_file(" - Threshold: {:.2f}".format(SDCOutput.SCORE_THRESHOLD), summary_out_file)
+        print_stdout_and_file(" * `Total SDC outputs` accounts for the number of executions in which at least one output value," \
+            "associated to a prediction with score above 0.3 in the golden execution, was corrupted.", summary_out_file)
+        print_stdout_and_file("    See `DETECTION_THRESHOLD` in `run_detection.py` and `CLASSIFICATION_THRESHOLD` in `run_classification.py`.", summary_out_file)
         print_stdout_and_file("", summary_out_file)
 
         print_stdout_and_file(">  MODELS", summary_out_file)
