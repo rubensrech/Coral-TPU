@@ -97,10 +97,17 @@ runs = runs.sort_values('benchmark')
 print("> ALL RUNS")
 print(runs)
 
+print("\n")
 print("> GROUPED BY BENCHMARK")
 runs_grouped_by_bench = runs.groupby('benchmark').agg({ c: 'sum' for c in COLUMNS[3:] })
 runs_grouped_by_bench['Error Rate'] = runs_grouped_by_bench['#SDC'] / runs_grouped_by_bench['Acc Time']
 print(runs_grouped_by_bench)
 
-runs.to_csv(PARSED_LOGS_FILE_NAME_PREFIX + '.csv')
-runs_grouped_by_bench.to_csv(PARSED_LOGS_FILE_NAME_PREFIX + 'benchmarks-error-rate.csv')
+print("\n")
+parsed_logs_out_file = PARSED_LOGS_FILE_NAME_PREFIX + '.csv'
+runs.to_csv(parsed_logs_out_file)
+print(f"Parsed logs saved to `{parsed_logs_out_file}`")
+
+benchmarks_error_rate_out_file = PARSED_LOGS_FILE_NAME_PREFIX + '-benchmarks-error-rate.csv'
+runs_grouped_by_bench.to_csv(benchmarks_error_rate_out_file)
+print(f"Benchmarks error rate saved to `{benchmarks_error_rate_out_file}`")
