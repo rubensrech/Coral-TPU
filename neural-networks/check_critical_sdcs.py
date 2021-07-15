@@ -4,6 +4,7 @@ import os
 import argparse
 from pathlib import Path
 from typing import List
+import pandas as pd
 
 from src.utils.logger import Logger
 Logger.setLevel(Logger.Level.INFO)
@@ -232,7 +233,8 @@ def percent(n, d):
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('sdcs_dir', help='Path to SDC output files directory')
+    parser.add_argument('sdcs_dir', default=None, help='Path to SDC output files directory')
+    parser.add_argument('total_sdcs', default=None, help='Path to CSV file containing the total number of SDCs for each model')
     parser.add_argument('-t', '--threshold', type=float, default=0.5, help='Threshold for detection/classification score')
     args = parser.parse_args()
 
@@ -244,6 +246,9 @@ def main():
     out_file_suffix = f"-{sdcs_sub_dir}.txt" if sdcs_sub_dir != "outputs" else ".txt"
     analysis_full_out_file = os.path.join(common.OUTPUTS_DIR, "sdcs-analysis-full" + out_file_suffix)
     analysis_summary_out_file = os.path.join(common.OUTPUTS_DIR, "sdcs-analysis-summary" + out_file_suffix)
+
+    total_sdcs_table = pd.read_csv(args.total_sdcs, index_col=0)
+    total_sdcs_map = total_sdcs_table['Total SDCs']
 
     SDCOutput.set_score_threshold(thresh)
 
@@ -283,7 +288,8 @@ def main():
 
         print_stdout_and_file(" - Full analysis output file: {:s}".format(analysis_full_out_file), summary_out_file)
         print_stdout_and_file(" - Threshold: {:.2f}".format(SDCOutput.SCORE_THRESHOLD), summary_out_file)
-        print_stdout_and_file(" * `Total SDC outputs` accounts for the number of executions in which at least one output value," \
+        print_stdout_and_file(" [1] `Total SDCs` is the total number of SDCs parsed from the execution logs", summary_out_file)
+        print_stdout_and_file(" [2] `Total SDC outputs` accounts for the number of executions in which at least one output value," \
             "associated to a prediction with score above 0.3 in the golden execution, was corrupted.", summary_out_file)
         print_stdout_and_file("    See `DETECTION_THRESHOLD` in `run_detection.py` and `CLASSIFICATION_THRESHOLD` in `run_classification.py`.", summary_out_file)
         print_stdout_and_file("", summary_out_file)
@@ -295,14 +301,16 @@ def main():
             print_stdout_and_file(f"{model_name}:", summary_out_file, indent_level=1)
 
             model_task = ModelsManager.get_by_name(model_name).task
+            total_sdcs = total_sdcs_map[model_name]
             total = stats.total_sdc_outputs
             criticals = stats.critical_sdc_outputs
             ignored = stats.ignored_sdc_outputs
             total_pred_errs = stats.total_prediction_errors
 
             print_stdout_and_file("- Task: {:s}".format(model_task.value), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Total SDC outputs*: {:d}".format(total), summary_out_file, indent_level=2)
-            print_stdout_and_file("- Critical SDC outputs: {:d} ({:.2f} %)".format(criticals, percent(criticals, total)), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Total SDCs [1]: {:d}".format(total_sdcs), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Total SDC outputs [2]: {:d}".format(total), summary_out_file, indent_level=2)
+            print_stdout_and_file("- Critical SDC outputs: {:d} ({:.2f} %)".format(criticals, percent(criticals, total_sdcs)), summary_out_file, indent_level=2)
             print_stdout_and_file("- Ignored SDC outputs: {:d} ({:.2f} %)".format(ignored, percent(ignored, total)), summary_out_file, indent_level=2)
             print_stdout_and_file("- Total prediction errors: {:d}".format(total_pred_errs), summary_out_file, indent_level=2)
             for err_type, err_count in sorted(stats.prediction_errors_by_type.items(), key=lambda item: item[1], reverse=True):

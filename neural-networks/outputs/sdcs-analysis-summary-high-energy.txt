@@ -3,15 +3,17 @@
 
  - Full analysis output file: /Users/rubensrechjunior/Downloads/TPU/Coral-TPU/neural-networks/outputs/sdcs-analysis-full-high-energy.txt
  - Threshold: 0.50
- * `Total SDC outputs` accounts for the number of executions in which at least one output value,associated to a prediction with score above 0.3 in the golden execution, was corrupted.
+ [1] `Total SDCs` is the total number of SDCs parsed from the execution logs
+ [2] `Total SDC outputs` accounts for the number of executions in which at least one output value,associated to a prediction with score above 0.3 in the golden execution, was corrupted.
     See `DETECTION_THRESHOLD` in `run_detection.py` and `CLASSIFICATION_THRESHOLD` in `run_classification.py`.
 
 >  MODELS
 
   ssd_mobilenet_v2_coco_quant_postprocess_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 2996
-    - Critical SDC outputs: 61 (2.04 %)
+    - Total SDCs [1]: 8870
+    - Total SDC outputs [2]: 2996
+    - Critical SDC outputs: 61 (0.69 %)
     - Ignored SDC outputs: 1 (0.03 %)
     - Total prediction errors: 121
       - WrongDetsNumb: 57 (47.11 %)
@@ -21,8 +23,9 @@
 
   ssdlite_mobiledet_coco_qat_postprocess_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 2325
-    - Critical SDC outputs: 237 (10.19 %)
+    - Total SDCs [1]: 5006
+    - Total SDC outputs [2]: 2325
+    - Critical SDC outputs: 237 (4.73 %)
     - Ignored SDC outputs: 4 (0.17 %)
     - Total prediction errors: 684
       - WrongS: 408 (59.65 %)
@@ -32,8 +35,9 @@
 
   ssd_mobilenet_v2_catsdogs_quant_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 1026
-    - Critical SDC outputs: 30 (2.92 %)
+    - Total SDCs [1]: 2055
+    - Total SDC outputs [2]: 1026
+    - Critical SDC outputs: 30 (1.46 %)
     - Ignored SDC outputs: 2 (0.19 %)
     - Total prediction errors: 52
       - WrongDetsNumb: 30 (57.69 %)
@@ -43,8 +47,9 @@
 
   ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 1167
-    - Critical SDC outputs: 12 (1.03 %)
+    - Total SDCs [1]: 2333
+    - Total SDC outputs [2]: 1167
+    - Critical SDC outputs: 12 (0.51 %)
     - Ignored SDC outputs: 1 (0.09 %)
     - Total prediction errors: 16
       - WrongDetsNumb: 11 (68.75 %)
@@ -54,8 +59,9 @@
 
   ssd_mobilenet_v2_subcoco14_quant_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 134
-    - Critical SDC outputs: 5 (3.73 %)
+    - Total SDCs [1]: 522
+    - Total SDC outputs [2]: 134
+    - Critical SDC outputs: 5 (0.96 %)
     - Ignored SDC outputs: 0 (0.00 %)
     - Total prediction errors: 15
       - WrongS: 9 (60.00 %)
@@ -65,8 +71,9 @@
 
   ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu:
     - Task: DETECTION
-    - Total SDC outputs*: 184
-    - Critical SDC outputs: 8 (4.35 %)
+    - Total SDCs [1]: 670
+    - Total SDC outputs [2]: 184
+    - Critical SDC outputs: 8 (1.19 %)
     - Ignored SDC outputs: 1 (0.54 %)
     - Total prediction errors: 25
       - WrongS: 15 (60.00 %)
@@ -76,8 +83,9 @@
 
   tfhub_tf2_resnet_50_imagenet_ptq_edgetpu:
     - Task: CLASSIFICATION
-    - Total SDC outputs*: 2189
-    - Critical SDC outputs: 6 (0.27 %)
+    - Total SDCs [1]: 5663
+    - Total SDC outputs [2]: 2189
+    - Critical SDC outputs: 6 (0.11 %)
     - Ignored SDC outputs: 6 (0.27 %)
     - Total prediction errors: 12
       - WrongClass: 6 (50.00 %)
@@ -87,8 +95,9 @@
 
   inception_v4_299_quant_edgetpu:
     - Task: CLASSIFICATION
-    - Total SDC outputs*: 3313
-    - Critical SDC outputs: 4 (0.12 %)
+    - Total SDCs [1]: 7193
+    - Total SDC outputs [2]: 3313
+    - Critical SDC outputs: 4 (0.06 %)
     - Ignored SDC outputs: 3 (0.09 %)
     - Total prediction errors: 8
       - WrongClass: 4 (50.00 %)
