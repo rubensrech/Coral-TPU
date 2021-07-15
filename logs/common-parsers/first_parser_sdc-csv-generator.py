@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+import sys
 import csv
 import re
 from datetime import datetime
@@ -7,25 +9,16 @@ import glob
 
 
 def main():
+    logs_dir = sys.argv[1] if sys.argv[1] else "."
     tmp_dir = "/tmp/parserSDC"
-    folder_p = "logs_parsed"
+    folder_p = os.path.join(logs_dir, "../logs_parsed")
 
     if not os.path.isdir(tmp_dir):
         os.mkdir(tmp_dir)
     else:
         os.system(f"rm -r -f {tmp_dir}/*")
 
-    all_tar = [y for x in os.walk(".") for y in glob.glob(os.path.join(x[0], '*.tar.gz'))]
-    for tar in all_tar:
-        try:
-            if os.system(f"tar -xzf {tar} -C {tmp_dir}/") != 0:
-                raise ValueError
-        except ValueError:
-            os.system(f"gzip -d {tar} -C {tmp_dir}/temp_file.tar")
-            os.system(f"tar -xf {tmp_dir} /temp_file.tar -C {tmp_dir}")
-
-    # Copy some other logs that are not compacted
-    all_logs_list = [y for x in os.walk(".") for y in glob.glob(os.path.join(x[0], '*.log'))]
+    all_logs_list = [y for x in os.walk(logs_dir) for y in glob.glob(os.path.join(x[0], '*.log'))]
     for log in all_logs_list:
         os.system(f"cp {log} {tmp_dir}/")
 
