@@ -11,7 +11,7 @@ import glob
 def main():
     logs_dir = sys.argv[1] if sys.argv[1] else "."
     tmp_dir = "/tmp/parserSDC"
-    folder_p = os.path.join(logs_dir, "../logs_parsed")
+    folder_p = os.path.join(logs_dir, "../logs-parsed")
 
     if not os.path.isdir(tmp_dir):
         os.mkdir(tmp_dir)
