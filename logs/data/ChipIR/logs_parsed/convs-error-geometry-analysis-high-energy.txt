@@ -1,0 +1,196 @@
+---- ERRORS GEOMETRY ANALYSIS FOR CONVOLUTION BENCHMARKS ----
+
+depthwise_conv_2d_1_1000_1000_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * UNDEFINED: 203
+    * SINGLE: 160
+    * SQUARE: 47
+    * RANDOM: 27
+    * LINE: 15
+  - Errors magnitude histogram
+    * 1: 2888
+    * 8: 29
+    * 32: 28
+    * 128: 22
+    * 4: 21
+    * 16: 20
+    * 2: 18
+    * 64: 18
+
+depthwise_conv_2d_1_1024_1024_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 17
+    * UNDEFINED: 9
+    * SQUARE: 9
+    * RANDOM: 3
+    * LINE: 2
+  - Errors magnitude histogram
+    * 1: 1124
+    * 2: 150
+    * 3: 60
+    * 64: 7
+    * 4: 6
+    * 16: 5
+    * 128: 3
+    * 32: 2
+    * 8: 1
+
+conv_2d_1_1000_1000_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * UNDEFINED: 64
+    * SINGLE: 42
+    * SQUARE: 19
+    * RANDOM: 9
+    * LINE: 6
+  - Errors magnitude histogram
+    * 1: 1580
+    * 16: 9
+    * 4: 8
+    * 64: 6
+    * 8: 5
+    * 32: 4
+    * 128: 3
+    * 2: 3
+
+depthwise_conv_2d_1_500_500_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 51
+    * SQUARE: 15
+    * RANDOM: 3
+    * UNDEFINED: 0
+    * LINE: 0
+  - Errors magnitude histogram
+    * 1: 963
+    * 2: 12
+    * 128: 8
+    * 8: 7
+    * 32: 7
+    * 4: 6
+    * 16: 4
+    * 64: 3
+
+conv_2d_1_1250_1250_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 46
+    * SQUARE: 26
+    * LINE: 8
+    * RANDOM: 6
+    * UNDEFINED: 0
+  - Errors magnitude histogram
+    * 1: 1438
+    * 2: 129
+    * 3: 92
+    * 5: 68
+    * 4: 62
+    * 6: 30
+    * 7: 15
+    * 8: 10
+    * 64: 7
+    * 128: 4
+    * 32: 3
+    * 16: 2
+
+conv_2d_1_500_500_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 54
+    * SQUARE: 20
+    * RANDOM: 16
+    * LINE: 14
+    * UNDEFINED: 0
+  - Errors magnitude histogram
+    * 1: 1727
+    * 8: 14
+    * 2: 14
+    * 64: 8
+    * 16: 7
+    * 128: 5
+    * 32: 4
+    * 4: 3
+
+conv_2d_1_256_256_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 2
+    * UNDEFINED: 0
+    * LINE: 0
+    * SQUARE: 0
+    * RANDOM: 0
+  - Errors magnitude histogram
+    * 8: 1
+    * 64: 1
+
+conv_2d_1_1024_1024_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 19
+    * UNDEFINED: 9
+    * LINE: 4
+    * SQUARE: 4
+    * RANDOM: 3
+  - Errors magnitude histogram
+    * 1: 204
+    * 51: 14
+    * 43: 9
+    * 42: 5
+    * 2: 4
+    * 128: 3
+    * 32: 3
+    * 50: 2
+    * 12: 1
+    * 41: 1
+    * 44: 1
+    * 16: 1
+    * 8: 1
+
+depthwise_conv_2d_1_512_512_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 19
+    * SQUARE: 6
+    * LINE: 3
+    * RANDOM: 2
+    * UNDEFINED: 0
+  - Errors magnitude histogram
+    * 1: 231
+    * 128: 6
+    * 64: 4
+    * 4: 3
+    * 16: 2
+    * 8: 2
+    * 2: 1
+
+depthwise_conv_2d_1_256_256_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 9
+    * SQUARE: 2
+    * LINE: 1
+    * RANDOM: 1
+    * UNDEFINED: 0
+  - Errors magnitude histogram
+    * 1: 59
+    * 64: 2
+    * 16: 2
+    * 2: 1
+    * 4: 1
+    * 32: 1
+
+conv_2d_1_512_512_1_40_40_1_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * SINGLE: 7
+    * LINE: 2
+    * SQUARE: 1
+    * RANDOM: 1
+    * UNDEFINED: 0
+  - Errors magnitude histogram
+    * 1: 260
+    * 2: 4
+    * 4: 2
+    * 128: 1
+
+depthwise_conv_2d_1_1250_1250_3_20_20_3_1_quant_edgetpu.tflite
+  - Errors geometry histogram
+    * UNDEFINED: 0
+    * SINGLE: 0
+    * LINE: 0
+    * SQUARE: 0
+    * RANDOM: 0
+  - Errors magnitude histogram
+    * No errors
+
