@@ -301,7 +301,7 @@ def main():
             print_stdout_and_file(f"{model_name}:", summary_out_file, indent_level=1)
 
             model_task = ModelsManager.get_by_name(model_name).task
-            total_sdcs = total_sdcs_map[model_name]
+            total_sdcs = total_sdcs_map.get(model_name, 0)
             total = stats.total_sdc_outputs
             criticals = stats.critical_sdc_outputs
             ignored = stats.ignored_sdc_outputs
