@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 LOGS_DIR = "./raw-logs"
-PARSED_LOGS_FILE_NAME_PREFIX = "parsed-logs"
+PARSED_LOGS_FILE_NAME_PREFIX = "logs-parsed/parsed-logs"
 
 def parse_model(header_line: str):
     if header_line.startswith('#HEADER'):
@@ -75,6 +75,9 @@ for log_filename in os.listdir(LOGS_DIR):
     if niterations == 0:
         corrupted_logs['Zero Iterations'] += 1
         continue
+    
+    if nend == 0:
+        ndue += 1
 
     if not acc_time_line:
         corrupted_logs['Other'] += 1
