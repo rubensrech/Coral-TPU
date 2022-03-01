@@ -5,6 +5,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Tuple
 
+import numpy as np
+import tensorflow as tf
+
 INSTALL_DIR = Path(__file__).parent.parent.absolute()
 GOLDEN_DIR = os.path.join(INSTALL_DIR, "golden")
 INPUTS_DIR = os.path.join(INSTALL_DIR, "inputs")
@@ -19,10 +22,34 @@ class Operation(Enum):
     # Values are the model filename prefix
     Conv2d = "conv_2d"
     DepthConv2d = "depthwise_conv_2d"
+    Add = "add"
 
     def flatbuffers_code(self):
         return self.value.upper()
     
+class Kernel(Enum):
+    Average = "AVERAGE"
+    Ones = "ONES"
+
+# Kernels
+
+def ones_kernel(size: Tuple[int]) -> tf.Tensor:
+    return np.ones(size, dtype=np.float32)
+
+def avg_kernel(size: Tuple[int]) -> tf.Tensor:
+    (H, W, *c) = size
+    return np.ones(size, dtype=np.float32)/(H*W)
+
+# Operation options
+
+class OperationOptions:
+    def __init__(self) -> None:
+        self.kernel_size = (20,20)
+        self.kernel_type = Kernel.Average
+
+    def __str__(self) -> str:
+        return "{\n\t" + ",\n\t".join([f"{k}: {v}" for (k,v) in vars(self).items()]) + "\n}"
+
 def echo_run(*args):
     args_list = list(map(str, args))
     p = subprocess.run(args_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -33,11 +60,17 @@ def echo_run(*args):
 def get_path_relative_to_install_dir(full_path):
     return os.path.relpath(full_path, INSTALL_DIR)
 
-def get_model_name(op: Operation, input_shape: Tuple[int], kernel_shape: Tuple[int], platform: Plataform):
+def get_model_name(op: Operation, input_shape: Tuple[int], platform: Plataform, op_attrs={}):
     op_name = op.value
     in_shape_str = "_".join(map(str, input_shape))
-    kernel_shape_str = "_".join(map(str, kernel_shape))
-    model_name = f"{op_name}_{in_shape_str}_{kernel_shape_str}"
+    op_attrs_str = ""
+
+    if op in [Operation.Conv2d, Operation.DepthConv2d]:
+        if not op_attrs['kernel_shape']:
+            raise RuntimeError(f"Attribute `kernel_shape` is required for Operation [{op}]")
+        op_attrs_str += "_".join(map(str, op_attrs['kernel_shape']))
+
+    model_name = f"{op_name}_{in_shape_str}_{op_attrs_str}"
 
     if platform == Plataform.EdgeTPU:
         return f"{model_name}_quant_edgetpu"
