@@ -232,6 +232,9 @@ class ModelsManager:
         # Classification
         Model(name='tfhub_tf2_resnet_50_imagenet_ptq_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
         Model(name='inception_v4_299_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
+        Model(name='efficientnet-edgetpu-S_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
+        Model(name='efficientnet-edgetpu-M_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
+        Model(name='efficientnet-edgetpu-L_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100')
     ]
 
     MODELS_MAP = { m.name: m for m in MODELS_LIST }
