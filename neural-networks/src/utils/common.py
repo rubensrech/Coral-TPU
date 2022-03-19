@@ -178,7 +178,8 @@ class DatasetsManager:
         Dataset('/home/carol/radiation-benchmarks/data/VOC2012', 100),
         Dataset('/home/carol/oxford-pets-100'),
         Dataset('/home/carol/subcoco14'),
-        Dataset('/home/carol/ILSVRC2012_val_100')
+        Dataset('/home/carol/ILSVRC2012_val_100'),
+        Dataset('/home/carol/rand_coco_subset_100')
     ]
 
     DATASETS_MAP = { d.name: d for d in DATASETS_LIST }
@@ -223,8 +224,8 @@ class Model:
 class ModelsManager:
     MODELS_LIST = [
         # Detection
-        Model(name='ssd_mobilenet_v2_coco_quant_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='VOC2012'),
-        Model(name='ssdlite_mobiledet_coco_qat_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='VOC2012'),
+        Model(name='ssd_mobilenet_v2_coco_quant_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='rand_coco_subset_100'),
+        Model(name='ssdlite_mobiledet_coco_qat_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='rand_coco_subset_100'),
         Model(name='ssd_mobilenet_v2_catsdogs_quant_edgetpu', task=ModelTask.Detection, labels='pets', dataset='oxford-pets-100'),
         Model(name='ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu', task=ModelTask.Detection, labels='pets', dataset='oxford-pets-100'),
         Model(name='ssd_mobilenet_v2_subcoco14_quant_edgetpu', task=ModelTask.Detection, labels='subcoco', dataset='subcoco14'),
