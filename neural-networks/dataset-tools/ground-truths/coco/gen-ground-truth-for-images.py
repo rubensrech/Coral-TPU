@@ -6,7 +6,8 @@ from typing import Dict, List
 from pathlib import Path
 from pycocotools.coco import COCO
 
-IMAGE_NAME_PATTERN = re.compile(r"(\d+)")
+IMAGE_NAME_PATTERN = re.compile(r"(\d{12})")
+CLASS_IDS_OFFSET = 1
 
 def load_labels_map(labels_file: str):
     with open(labels_file, "r", encoding="utf-8") as f:
@@ -18,7 +19,7 @@ def load_labels_map(labels_file: str):
         pair = re.split(r'[:\s]+', line.strip(), maxsplit=1)
         assert len(pair) == 2, f"Invalid line [{i}] in file [{labels_file}]"
 
-        class_id = int(pair[0])
+        class_id = int(pair[0]) + CLASS_IDS_OFFSET
         class_label = pair[1].strip()
         labels_map[class_id] = class_label
 
@@ -31,13 +32,14 @@ def getAnnotationsForImage(img_id: str, coco: COCO, labels_map: Dict[int, str]={
     objs_data = []
 
     for ann in anns:
+        class_id = ann["category_id"]
         objs_data.append({
-            "class_id": ann["category_id"],
+            "class_id": class_id,
             "bbox_x": ann["bbox"][0],
             "bbox_y": ann["bbox"][1],
             "bbox_w": ann["bbox"][2],
             "bbox_h": ann["bbox"][3],
-            "class_label": labels_map[ann["category_id"]] if ann["category_id"] in labels_map else None
+            "class_label": labels_map[class_id] if class_id in labels_map else None
         })
     
     return objs_data
