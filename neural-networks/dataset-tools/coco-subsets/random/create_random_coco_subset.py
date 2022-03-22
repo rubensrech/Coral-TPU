@@ -1,11 +1,30 @@
 import os
+import re
 import json
-import argparse
 import random 
+import argparse
 
 from pycocotools.coco import COCO
 
-def select_images_and_get_details(coco: COCO, numImages: int):
+IMAGE_LIST_FILE_LINE_PATTERN = re.compile(r".*(\d{12})\.[a-zA-Z]+")
+
+def get_image_details_for_images_in_file(image_list_file: str, coco: COCO):
+    with open(image_list_file, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    img_details = []
+
+    for i, line in enumerate(lines):
+        match = IMAGE_LIST_FILE_LINE_PATTERN.match(line)
+        assert match is not None, f"Invalid line [{i}] in file [{image_list_file}] (#1)"
+        assert len(match.groups()) == 1, f"Invalid line [{i}] in file [{image_list_file}] (#2)"
+
+        img_id = int(match.group(1).strip())
+        img_details.append(coco.imgs[img_id])
+
+    return img_details
+
+def get_image_details_for_random_sample(coco: COCO, numImages: int):
     imgIndexes = random.sample(list(coco.imgs), numImages)
     imgDetails = [coco.imgs[idx] for idx in imgIndexes]
 
@@ -42,16 +61,18 @@ def write_output_files(imgDetails, imgsDir):
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--annotations_file_path', required=True, default="/Users/rubensrechjunior/TPU/coco2017_train_val_annotations/instances_val2017.json",
+    parser.add_argument('--annotations_file_path', required=False, default="/Users/rubensrechjunior/Downloads/TPU/coco2017_train_val_annotations/instances_val2017.json",
                 help='Path to the COCO annotations file. (Can be downloaded here: http://images.cocodataset.org/annotations/annotations_trainval2017.zip)')
-    parser.add_argument('--num_images', required=True, type=int, default=100,
+    parser.add_argument('--num_images', required=False, type=int, default=100,
                 help='Number of images to be included in the output list.')
     parser.add_argument('--images_dir', required=False, default="",
                 help='Path to directory containing the COCO images.')
+    parser.add_argument('--images_list_file', required=False, default=None,
+                help='Path to file containing a list of images from COCO dataset. If this is not provided, a random sample of images will be used.')
     args = parser.parse_args()
 
     coco = COCO(args.annotations_file_path)
-    imgDetails = select_images_and_get_details(coco, args.num_images)
+    imgDetails = get_image_details_for_images_in_file(args.images_list_file, coco) if args.images_list_file else get_image_details_for_random_sample(coco, args.num_images)
     write_output_files(imgDetails, args.images_dir)
 
 
