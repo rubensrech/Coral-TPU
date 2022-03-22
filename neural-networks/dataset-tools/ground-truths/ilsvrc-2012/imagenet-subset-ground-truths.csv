@@ -1,101 +1,101 @@
 img_name,img_path,img_id,class_id,class_label
-ILSVRC2012_val_00013141,data/imagenet/subset/ILSVRC2012_val_00013141.JPEG,13141,290,"snow leopard, ounce, Panthera uncia"
-ILSVRC2012_val_00009627,data/imagenet/subset/ILSVRC2012_val_00009627.JPEG,9627,649,"medicine chest, medicine cabinet"
-ILSVRC2012_val_00016945,data/imagenet/subset/ILSVRC2012_val_00016945.JPEG,16945,628,"limousine, limo"
-ILSVRC2012_val_00045197,data/imagenet/subset/ILSVRC2012_val_00045197.JPEG,45197,500,"cleaver, meat cleaver, chopper"
-ILSVRC2012_val_00027112,data/imagenet/subset/ILSVRC2012_val_00027112.JPEG,27112,590,"hand blower, blow dryer, blow drier, hair dryer, hair drier"
-ILSVRC2012_val_00044732,data/imagenet/subset/ILSVRC2012_val_00044732.JPEG,44732,273,"coyote, prairie wolf, brush wolf, Canis latrans"
-ILSVRC2012_val_00013106,data/imagenet/subset/ILSVRC2012_val_00013106.JPEG,13106,862,toilet seat
-ILSVRC2012_val_00036948,data/imagenet/subset/ILSVRC2012_val_00036948.JPEG,36948,592,"handkerchief, hankie, hanky, hankey"
-ILSVRC2012_val_00027764,data/imagenet/subset/ILSVRC2012_val_00027764.JPEG,27764,804,"snowplow, snowplough"
-ILSVRC2012_val_00020990,data/imagenet/subset/ILSVRC2012_val_00020990.JPEG,20990,416,"bakery, bakeshop, bakehouse"
-ILSVRC2012_val_00013030,data/imagenet/subset/ILSVRC2012_val_00013030.JPEG,13030,924,plate
-ILSVRC2012_val_00041755,data/imagenet/subset/ILSVRC2012_val_00041755.JPEG,41755,66,sea snake
-ILSVRC2012_val_00028437,data/imagenet/subset/ILSVRC2012_val_00028437.JPEG,28437,465,buckle
-ILSVRC2012_val_00001538,data/imagenet/subset/ILSVRC2012_val_00001538.JPEG,1538,167,"Walker hound, Walker foxhound"
-ILSVRC2012_val_00010252,data/imagenet/subset/ILSVRC2012_val_00010252.JPEG,10252,437,"beach wagon, station wagon, wagon, estate car, beach waggon, station waggon, waggon"
-ILSVRC2012_val_00025720,data/imagenet/subset/ILSVRC2012_val_00025720.JPEG,25720,226,malinois
-ILSVRC2012_val_00042076,data/imagenet/subset/ILSVRC2012_val_00042076.JPEG,42076,311,"ant, emmet, pismire"
-ILSVRC2012_val_00028399,data/imagenet/subset/ILSVRC2012_val_00028399.JPEG,28399,567,"French horn, horn"
-ILSVRC2012_val_00018897,data/imagenet/subset/ILSVRC2012_val_00018897.JPEG,18897,466,bulletproof vest
-ILSVRC2012_val_00043265,data/imagenet/subset/ILSVRC2012_val_00043265.JPEG,43265,936,mashed potato
-ILSVRC2012_val_00002090,data/imagenet/subset/ILSVRC2012_val_00002090.JPEG,2090,147,"albatross, mollymawk"
-ILSVRC2012_val_00009004,data/imagenet/subset/ILSVRC2012_val_00009004.JPEG,9004,237,"Doberman, Doberman pinscher"
-ILSVRC2012_val_00020981,data/imagenet/subset/ILSVRC2012_val_00020981.JPEG,20981,426,barn
-ILSVRC2012_val_00044978,data/imagenet/subset/ILSVRC2012_val_00044978.JPEG,44978,163,beagle
-ILSVRC2012_val_00030866,data/imagenet/subset/ILSVRC2012_val_00030866.JPEG,30866,423,barbell
-ILSVRC2012_val_00031293,data/imagenet/subset/ILSVRC2012_val_00031293.JPEG,31293,345,"hippopotamus, hippo, river horse, Hippopotamus amphibius"
-ILSVRC2012_val_00032480,data/imagenet/subset/ILSVRC2012_val_00032480.JPEG,32480,733,"Polaroid camera, Polaroid Land camera"
-ILSVRC2012_val_00020002,data/imagenet/subset/ILSVRC2012_val_00020002.JPEG,20002,469,"cab, hack, taxi, taxicab"
-ILSVRC2012_val_00034718,data/imagenet/subset/ILSVRC2012_val_00034718.JPEG,34718,399,abacus
-ILSVRC2012_val_00007613,data/imagenet/subset/ILSVRC2012_val_00007613.JPEG,7613,974,coral reef
-ILSVRC2012_val_00025520,data/imagenet/subset/ILSVRC2012_val_00025520.JPEG,25520,190,Lakeland terrier
-ILSVRC2012_val_00001723,data/imagenet/subset/ILSVRC2012_val_00001723.JPEG,1723,716,pickelhaube
-ILSVRC2012_val_00019962,data/imagenet/subset/ILSVRC2012_val_00019962.JPEG,19962,193,"cairn, cairn terrier"
-ILSVRC2012_val_00038475,data/imagenet/subset/ILSVRC2012_val_00038475.JPEG,38475,392,"coho, cohoe, coho salmon, blue jack, silver salmon, Oncorhynchus kisutch"
-ILSVRC2012_val_00046540,data/imagenet/subset/ILSVRC2012_val_00046540.JPEG,46540,485,catamaran
-ILSVRC2012_val_00047980,data/imagenet/subset/ILSVRC2012_val_00047980.JPEG,47980,956,"jackfruit, jak, jack"
-ILSVRC2012_val_00018984,data/imagenet/subset/ILSVRC2012_val_00018984.JPEG,18984,631,Loafer
-ILSVRC2012_val_00022337,data/imagenet/subset/ILSVRC2012_val_00022337.JPEG,22337,286,Egyptian cat
-ILSVRC2012_val_00012485,data/imagenet/subset/ILSVRC2012_val_00012485.JPEG,12485,801,"slot, one-armed bandit"
-ILSVRC2012_val_00046621,data/imagenet/subset/ILSVRC2012_val_00046621.JPEG,46621,84,"prairie chicken, prairie grouse, prairie fowl"
-ILSVRC2012_val_00004537,data/imagenet/subset/ILSVRC2012_val_00004537.JPEG,4537,618,"lab coat, laboratory coat"
-ILSVRC2012_val_00016194,data/imagenet/subset/ILSVRC2012_val_00016194.JPEG,16194,284,Persian cat
-ILSVRC2012_val_00042746,data/imagenet/subset/ILSVRC2012_val_00042746.JPEG,42746,668,mortarboard
-ILSVRC2012_val_00024842,data/imagenet/subset/ILSVRC2012_val_00024842.JPEG,24842,548,electric locomotive
-ILSVRC2012_val_00032364,data/imagenet/subset/ILSVRC2012_val_00032364.JPEG,32364,884,vase
-ILSVRC2012_val_00003503,data/imagenet/subset/ILSVRC2012_val_00003503.JPEG,3503,615,kimono
-ILSVRC2012_val_00037404,data/imagenet/subset/ILSVRC2012_val_00037404.JPEG,37404,602,"hoopskirt, crinoline"
-ILSVRC2012_val_00039478,data/imagenet/subset/ILSVRC2012_val_00039478.JPEG,39478,33,"tailed frog, bell toad, ribbed toad, tailed toad, Ascaphus trui"
-ILSVRC2012_val_00003373,data/imagenet/subset/ILSVRC2012_val_00003373.JPEG,3373,663,modem
-ILSVRC2012_val_00011212,data/imagenet/subset/ILSVRC2012_val_00011212.JPEG,11212,227,briard
-ILSVRC2012_val_00025941,data/imagenet/subset/ILSVRC2012_val_00025941.JPEG,25941,387,"African elephant, Loxodonta africana"
-ILSVRC2012_val_00036736,data/imagenet/subset/ILSVRC2012_val_00036736.JPEG,36736,426,barn
-ILSVRC2012_val_00006947,data/imagenet/subset/ILSVRC2012_val_00006947.JPEG,6947,219,Welsh springer spaniel
-ILSVRC2012_val_00021041,data/imagenet/subset/ILSVRC2012_val_00021041.JPEG,21041,693,packet
-ILSVRC2012_val_00047243,data/imagenet/subset/ILSVRC2012_val_00047243.JPEG,47243,59,water snake
-ILSVRC2012_val_00015078,data/imagenet/subset/ILSVRC2012_val_00015078.JPEG,15078,562,forklift
-ILSVRC2012_val_00047362,data/imagenet/subset/ILSVRC2012_val_00047362.JPEG,47362,484,castle
-ILSVRC2012_val_00041602,data/imagenet/subset/ILSVRC2012_val_00041602.JPEG,41602,928,trifle
-ILSVRC2012_val_00038268,data/imagenet/subset/ILSVRC2012_val_00038268.JPEG,38268,570,"garbage truck, dustcart"
-ILSVRC2012_val_00000520,data/imagenet/subset/ILSVRC2012_val_00000520.JPEG,520,378,marmoset
-ILSVRC2012_val_00010186,data/imagenet/subset/ILSVRC2012_val_00010186.JPEG,10186,562,forklift
-ILSVRC2012_val_00008732,data/imagenet/subset/ILSVRC2012_val_00008732.JPEG,8732,587,half track
-ILSVRC2012_val_00014208,data/imagenet/subset/ILSVRC2012_val_00014208.JPEG,14208,512,convertible
-ILSVRC2012_val_00033968,data/imagenet/subset/ILSVRC2012_val_00033968.JPEG,33968,738,"pop bottle, soda bottle"
-ILSVRC2012_val_00003758,data/imagenet/subset/ILSVRC2012_val_00003758.JPEG,3758,198,giant schnauzer
-ILSVRC2012_val_00035458,data/imagenet/subset/ILSVRC2012_val_00035458.JPEG,35458,138,"American coot, marsh hen, mud hen, water hen, Fulica americana"
-ILSVRC2012_val_00014995,data/imagenet/subset/ILSVRC2012_val_00014995.JPEG,14995,195,"Dandie Dinmont, Dandie Dinmont terrier"
-ILSVRC2012_val_00045013,data/imagenet/subset/ILSVRC2012_val_00045013.JPEG,45013,719,pier
-ILSVRC2012_val_00007040,data/imagenet/subset/ILSVRC2012_val_00007040.JPEG,7040,914,wreck
-ILSVRC2012_val_00016765,data/imagenet/subset/ILSVRC2012_val_00016765.JPEG,16765,292,"lion, king of beasts, Panthera leo"
-ILSVRC2012_val_00030786,data/imagenet/subset/ILSVRC2012_val_00030786.JPEG,30786,241,Appenzeller
-ILSVRC2012_val_00017216,data/imagenet/subset/ILSVRC2012_val_00017216.JPEG,17216,801,"slot, one-armed bandit"
-ILSVRC2012_val_00018176,data/imagenet/subset/ILSVRC2012_val_00018176.JPEG,18176,879,typewriter keyboard
-ILSVRC2012_val_00020678,data/imagenet/subset/ILSVRC2012_val_00020678.JPEG,20678,231,"Shetland sheepdog, Shetland sheep dog, Shetland"
-ILSVRC2012_val_00024210,data/imagenet/subset/ILSVRC2012_val_00024210.JPEG,24210,490,chainlink fence
-ILSVRC2012_val_00020474,data/imagenet/subset/ILSVRC2012_val_00020474.JPEG,20474,266,toy poodle
-ILSVRC2012_val_00005984,data/imagenet/subset/ILSVRC2012_val_00005984.JPEG,5984,226,malinois
-ILSVRC2012_val_00048554,data/imagenet/subset/ILSVRC2012_val_00048554.JPEG,48554,515,cowboy boot
-ILSVRC2012_val_00005192,data/imagenet/subset/ILSVRC2012_val_00005192.JPEG,5192,401,"academic gown, academic robe, judge's robe"
-ILSVRC2012_val_00028050,data/imagenet/subset/ILSVRC2012_val_00028050.JPEG,28050,207,curly-coated retriever
-ILSVRC2012_val_00025925,data/imagenet/subset/ILSVRC2012_val_00025925.JPEG,25925,650,"megalith, megalithic structure"
-ILSVRC2012_val_00019349,data/imagenet/subset/ILSVRC2012_val_00019349.JPEG,19349,830,"streetcar, tram, tramcar, trolley, trolley car"
-ILSVRC2012_val_00012563,data/imagenet/subset/ILSVRC2012_val_00012563.JPEG,12563,420,Band Aid
-ILSVRC2012_val_00022123,data/imagenet/subset/ILSVRC2012_val_00022123.JPEG,22123,515,cowboy boot
-ILSVRC2012_val_00001310,data/imagenet/subset/ILSVRC2012_val_00001310.JPEG,1310,912,"wool, woolen, woollen"
-ILSVRC2012_val_00033028,data/imagenet/subset/ILSVRC2012_val_00033028.JPEG,33028,974,coral reef
-ILSVRC2012_val_00005679,data/imagenet/subset/ILSVRC2012_val_00005679.JPEG,5679,788,"shield, buckler"
-ILSVRC2012_val_00013615,data/imagenet/subset/ILSVRC2012_val_00013615.JPEG,13615,642,maraca
-ILSVRC2012_val_00012834,data/imagenet/subset/ILSVRC2012_val_00012834.JPEG,12834,195,"Dandie Dinmont, Dandie Dinmont terrier"
-ILSVRC2012_val_00026477,data/imagenet/subset/ILSVRC2012_val_00026477.JPEG,26477,821,steam locomotive
-ILSVRC2012_val_00008434,data/imagenet/subset/ILSVRC2012_val_00008434.JPEG,8434,557,"fire screen, fireguard"
-ILSVRC2012_val_00017094,data/imagenet/subset/ILSVRC2012_val_00017094.JPEG,17094,848,"tank, army tank, armored combat vehicle, armoured combat vehicle"
-ILSVRC2012_val_00021597,data/imagenet/subset/ILSVRC2012_val_00021597.JPEG,21597,311,"ant, emmet, pismire"
-ILSVRC2012_val_00042406,data/imagenet/subset/ILSVRC2012_val_00042406.JPEG,42406,359,"polecat, fitch, foulmart, foumart, Mustela putorius"
-ILSVRC2012_val_00042602,data/imagenet/subset/ILSVRC2012_val_00042602.JPEG,42602,42,"whiptail, whiptail lizard"
-ILSVRC2012_val_00004546,data/imagenet/subset/ILSVRC2012_val_00004546.JPEG,4546,984,scuba diver
-ILSVRC2012_val_00031351,data/imagenet/subset/ILSVRC2012_val_00031351.JPEG,31351,920,street sign
-ILSVRC2012_val_00036583,data/imagenet/subset/ILSVRC2012_val_00036583.JPEG,36583,700,"panpipe, pandean pipe, syrinx"
-ILSVRC2012_val_00009961,data/imagenet/subset/ILSVRC2012_val_00009961.JPEG,9961,515,cowboy boot
-ILSVRC2012_val_00023915,data/imagenet/subset/ILSVRC2012_val_00023915.JPEG,23915,538,"dogsled, dog sled, dog sleigh"
+ILSVRC2012_val_00013141,data/imagenet/subset/ILSVRC2012_val_00013141.JPEG,13141,289,"snow leopard, ounce, Panthera uncia"
+ILSVRC2012_val_00009627,data/imagenet/subset/ILSVRC2012_val_00009627.JPEG,9627,648,"medicine chest, medicine cabinet"
+ILSVRC2012_val_00016945,data/imagenet/subset/ILSVRC2012_val_00016945.JPEG,16945,627,"limousine, limo"
+ILSVRC2012_val_00045197,data/imagenet/subset/ILSVRC2012_val_00045197.JPEG,45197,499,"cleaver, meat cleaver, chopper"
+ILSVRC2012_val_00027112,data/imagenet/subset/ILSVRC2012_val_00027112.JPEG,27112,589,"hand blower, blow dryer, blow drier, hair dryer, hair drier"
+ILSVRC2012_val_00044732,data/imagenet/subset/ILSVRC2012_val_00044732.JPEG,44732,272,"coyote, prairie wolf, brush wolf, Canis latrans"
+ILSVRC2012_val_00013106,data/imagenet/subset/ILSVRC2012_val_00013106.JPEG,13106,861,toilet seat
+ILSVRC2012_val_00036948,data/imagenet/subset/ILSVRC2012_val_00036948.JPEG,36948,591,"handkerchief, hankie, hanky, hankey"
+ILSVRC2012_val_00027764,data/imagenet/subset/ILSVRC2012_val_00027764.JPEG,27764,803,"snowplow, snowplough"
+ILSVRC2012_val_00020990,data/imagenet/subset/ILSVRC2012_val_00020990.JPEG,20990,415,"bakery, bakeshop, bakehouse"
+ILSVRC2012_val_00013030,data/imagenet/subset/ILSVRC2012_val_00013030.JPEG,13030,923,plate
+ILSVRC2012_val_00041755,data/imagenet/subset/ILSVRC2012_val_00041755.JPEG,41755,65,sea snake
+ILSVRC2012_val_00028437,data/imagenet/subset/ILSVRC2012_val_00028437.JPEG,28437,464,buckle
+ILSVRC2012_val_00001538,data/imagenet/subset/ILSVRC2012_val_00001538.JPEG,1538,166,"Walker hound, Walker foxhound"
+ILSVRC2012_val_00010252,data/imagenet/subset/ILSVRC2012_val_00010252.JPEG,10252,436,"beach wagon, station wagon, wagon, estate car, beach waggon, station waggon, waggon"
+ILSVRC2012_val_00025720,data/imagenet/subset/ILSVRC2012_val_00025720.JPEG,25720,225,malinois
+ILSVRC2012_val_00042076,data/imagenet/subset/ILSVRC2012_val_00042076.JPEG,42076,310,"ant, emmet, pismire"
+ILSVRC2012_val_00028399,data/imagenet/subset/ILSVRC2012_val_00028399.JPEG,28399,566,"French horn, horn"
+ILSVRC2012_val_00018897,data/imagenet/subset/ILSVRC2012_val_00018897.JPEG,18897,465,bulletproof vest
+ILSVRC2012_val_00043265,data/imagenet/subset/ILSVRC2012_val_00043265.JPEG,43265,935,mashed potato
+ILSVRC2012_val_00002090,data/imagenet/subset/ILSVRC2012_val_00002090.JPEG,2090,146,"albatross, mollymawk"
+ILSVRC2012_val_00009004,data/imagenet/subset/ILSVRC2012_val_00009004.JPEG,9004,236,"Doberman, Doberman pinscher"
+ILSVRC2012_val_00020981,data/imagenet/subset/ILSVRC2012_val_00020981.JPEG,20981,425,barn
+ILSVRC2012_val_00044978,data/imagenet/subset/ILSVRC2012_val_00044978.JPEG,44978,162,beagle
+ILSVRC2012_val_00030866,data/imagenet/subset/ILSVRC2012_val_00030866.JPEG,30866,422,barbell
+ILSVRC2012_val_00031293,data/imagenet/subset/ILSVRC2012_val_00031293.JPEG,31293,344,"hippopotamus, hippo, river horse, Hippopotamus amphibius"
+ILSVRC2012_val_00032480,data/imagenet/subset/ILSVRC2012_val_00032480.JPEG,32480,732,"Polaroid camera, Polaroid Land camera"
+ILSVRC2012_val_00020002,data/imagenet/subset/ILSVRC2012_val_00020002.JPEG,20002,468,"cab, hack, taxi, taxicab"
+ILSVRC2012_val_00034718,data/imagenet/subset/ILSVRC2012_val_00034718.JPEG,34718,398,abacus
+ILSVRC2012_val_00007613,data/imagenet/subset/ILSVRC2012_val_00007613.JPEG,7613,973,coral reef
+ILSVRC2012_val_00025520,data/imagenet/subset/ILSVRC2012_val_00025520.JPEG,25520,189,Lakeland terrier
+ILSVRC2012_val_00001723,data/imagenet/subset/ILSVRC2012_val_00001723.JPEG,1723,715,pickelhaube
+ILSVRC2012_val_00019962,data/imagenet/subset/ILSVRC2012_val_00019962.JPEG,19962,192,"cairn, cairn terrier"
+ILSVRC2012_val_00038475,data/imagenet/subset/ILSVRC2012_val_00038475.JPEG,38475,391,"coho, cohoe, coho salmon, blue jack, silver salmon, Oncorhynchus kisutch"
+ILSVRC2012_val_00046540,data/imagenet/subset/ILSVRC2012_val_00046540.JPEG,46540,484,catamaran
+ILSVRC2012_val_00047980,data/imagenet/subset/ILSVRC2012_val_00047980.JPEG,47980,955,"jackfruit, jak, jack"
+ILSVRC2012_val_00018984,data/imagenet/subset/ILSVRC2012_val_00018984.JPEG,18984,630,Loafer
+ILSVRC2012_val_00022337,data/imagenet/subset/ILSVRC2012_val_00022337.JPEG,22337,285,Egyptian cat
+ILSVRC2012_val_00012485,data/imagenet/subset/ILSVRC2012_val_00012485.JPEG,12485,800,"slot, one-armed bandit"
+ILSVRC2012_val_00046621,data/imagenet/subset/ILSVRC2012_val_00046621.JPEG,46621,83,"prairie chicken, prairie grouse, prairie fowl"
+ILSVRC2012_val_00004537,data/imagenet/subset/ILSVRC2012_val_00004537.JPEG,4537,617,"lab coat, laboratory coat"
+ILSVRC2012_val_00016194,data/imagenet/subset/ILSVRC2012_val_00016194.JPEG,16194,283,Persian cat
+ILSVRC2012_val_00042746,data/imagenet/subset/ILSVRC2012_val_00042746.JPEG,42746,667,mortarboard
+ILSVRC2012_val_00024842,data/imagenet/subset/ILSVRC2012_val_00024842.JPEG,24842,547,electric locomotive
+ILSVRC2012_val_00032364,data/imagenet/subset/ILSVRC2012_val_00032364.JPEG,32364,883,vase
+ILSVRC2012_val_00003503,data/imagenet/subset/ILSVRC2012_val_00003503.JPEG,3503,614,kimono
+ILSVRC2012_val_00037404,data/imagenet/subset/ILSVRC2012_val_00037404.JPEG,37404,601,"hoopskirt, crinoline"
+ILSVRC2012_val_00039478,data/imagenet/subset/ILSVRC2012_val_00039478.JPEG,39478,32,"tailed frog, bell toad, ribbed toad, tailed toad, Ascaphus trui"
+ILSVRC2012_val_00003373,data/imagenet/subset/ILSVRC2012_val_00003373.JPEG,3373,662,modem
+ILSVRC2012_val_00011212,data/imagenet/subset/ILSVRC2012_val_00011212.JPEG,11212,226,briard
+ILSVRC2012_val_00025941,data/imagenet/subset/ILSVRC2012_val_00025941.JPEG,25941,386,"African elephant, Loxodonta africana"
+ILSVRC2012_val_00036736,data/imagenet/subset/ILSVRC2012_val_00036736.JPEG,36736,425,barn
+ILSVRC2012_val_00006947,data/imagenet/subset/ILSVRC2012_val_00006947.JPEG,6947,218,Welsh springer spaniel
+ILSVRC2012_val_00021041,data/imagenet/subset/ILSVRC2012_val_00021041.JPEG,21041,692,packet
+ILSVRC2012_val_00047243,data/imagenet/subset/ILSVRC2012_val_00047243.JPEG,47243,58,water snake
+ILSVRC2012_val_00015078,data/imagenet/subset/ILSVRC2012_val_00015078.JPEG,15078,561,forklift
+ILSVRC2012_val_00047362,data/imagenet/subset/ILSVRC2012_val_00047362.JPEG,47362,483,castle
+ILSVRC2012_val_00041602,data/imagenet/subset/ILSVRC2012_val_00041602.JPEG,41602,927,trifle
+ILSVRC2012_val_00038268,data/imagenet/subset/ILSVRC2012_val_00038268.JPEG,38268,569,"garbage truck, dustcart"
+ILSVRC2012_val_00000520,data/imagenet/subset/ILSVRC2012_val_00000520.JPEG,520,377,marmoset
+ILSVRC2012_val_00010186,data/imagenet/subset/ILSVRC2012_val_00010186.JPEG,10186,561,forklift
+ILSVRC2012_val_00008732,data/imagenet/subset/ILSVRC2012_val_00008732.JPEG,8732,586,half track
+ILSVRC2012_val_00014208,data/imagenet/subset/ILSVRC2012_val_00014208.JPEG,14208,511,convertible
+ILSVRC2012_val_00033968,data/imagenet/subset/ILSVRC2012_val_00033968.JPEG,33968,737,"pop bottle, soda bottle"
+ILSVRC2012_val_00003758,data/imagenet/subset/ILSVRC2012_val_00003758.JPEG,3758,197,giant schnauzer
+ILSVRC2012_val_00035458,data/imagenet/subset/ILSVRC2012_val_00035458.JPEG,35458,137,"American coot, marsh hen, mud hen, water hen, Fulica americana"
+ILSVRC2012_val_00014995,data/imagenet/subset/ILSVRC2012_val_00014995.JPEG,14995,194,"Dandie Dinmont, Dandie Dinmont terrier"
+ILSVRC2012_val_00045013,data/imagenet/subset/ILSVRC2012_val_00045013.JPEG,45013,718,pier
+ILSVRC2012_val_00007040,data/imagenet/subset/ILSVRC2012_val_00007040.JPEG,7040,913,wreck
+ILSVRC2012_val_00016765,data/imagenet/subset/ILSVRC2012_val_00016765.JPEG,16765,291,"lion, king of beasts, Panthera leo"
+ILSVRC2012_val_00030786,data/imagenet/subset/ILSVRC2012_val_00030786.JPEG,30786,240,Appenzeller
+ILSVRC2012_val_00017216,data/imagenet/subset/ILSVRC2012_val_00017216.JPEG,17216,800,"slot, one-armed bandit"
+ILSVRC2012_val_00018176,data/imagenet/subset/ILSVRC2012_val_00018176.JPEG,18176,878,typewriter keyboard
+ILSVRC2012_val_00020678,data/imagenet/subset/ILSVRC2012_val_00020678.JPEG,20678,230,"Shetland sheepdog, Shetland sheep dog, Shetland"
+ILSVRC2012_val_00024210,data/imagenet/subset/ILSVRC2012_val_00024210.JPEG,24210,489,chainlink fence
+ILSVRC2012_val_00020474,data/imagenet/subset/ILSVRC2012_val_00020474.JPEG,20474,265,toy poodle
+ILSVRC2012_val_00005984,data/imagenet/subset/ILSVRC2012_val_00005984.JPEG,5984,225,malinois
+ILSVRC2012_val_00048554,data/imagenet/subset/ILSVRC2012_val_00048554.JPEG,48554,514,cowboy boot
+ILSVRC2012_val_00005192,data/imagenet/subset/ILSVRC2012_val_00005192.JPEG,5192,400,"academic gown, academic robe, judge's robe"
+ILSVRC2012_val_00028050,data/imagenet/subset/ILSVRC2012_val_00028050.JPEG,28050,206,curly-coated retriever
+ILSVRC2012_val_00025925,data/imagenet/subset/ILSVRC2012_val_00025925.JPEG,25925,649,"megalith, megalithic structure"
+ILSVRC2012_val_00019349,data/imagenet/subset/ILSVRC2012_val_00019349.JPEG,19349,829,"streetcar, tram, tramcar, trolley, trolley car"
+ILSVRC2012_val_00012563,data/imagenet/subset/ILSVRC2012_val_00012563.JPEG,12563,419,Band Aid
+ILSVRC2012_val_00022123,data/imagenet/subset/ILSVRC2012_val_00022123.JPEG,22123,514,cowboy boot
+ILSVRC2012_val_00001310,data/imagenet/subset/ILSVRC2012_val_00001310.JPEG,1310,911,"wool, woolen, woollen"
+ILSVRC2012_val_00033028,data/imagenet/subset/ILSVRC2012_val_00033028.JPEG,33028,973,coral reef
+ILSVRC2012_val_00005679,data/imagenet/subset/ILSVRC2012_val_00005679.JPEG,5679,787,"shield, buckler"
+ILSVRC2012_val_00013615,data/imagenet/subset/ILSVRC2012_val_00013615.JPEG,13615,641,maraca
+ILSVRC2012_val_00012834,data/imagenet/subset/ILSVRC2012_val_00012834.JPEG,12834,194,"Dandie Dinmont, Dandie Dinmont terrier"
+ILSVRC2012_val_00026477,data/imagenet/subset/ILSVRC2012_val_00026477.JPEG,26477,820,steam locomotive
+ILSVRC2012_val_00008434,data/imagenet/subset/ILSVRC2012_val_00008434.JPEG,8434,556,"fire screen, fireguard"
+ILSVRC2012_val_00017094,data/imagenet/subset/ILSVRC2012_val_00017094.JPEG,17094,847,"tank, army tank, armored combat vehicle, armoured combat vehicle"
+ILSVRC2012_val_00021597,data/imagenet/subset/ILSVRC2012_val_00021597.JPEG,21597,310,"ant, emmet, pismire"
+ILSVRC2012_val_00042406,data/imagenet/subset/ILSVRC2012_val_00042406.JPEG,42406,358,"polecat, fitch, foulmart, foumart, Mustela putorius"
+ILSVRC2012_val_00042602,data/imagenet/subset/ILSVRC2012_val_00042602.JPEG,42602,41,"whiptail, whiptail lizard"
+ILSVRC2012_val_00004546,data/imagenet/subset/ILSVRC2012_val_00004546.JPEG,4546,983,scuba diver
+ILSVRC2012_val_00031351,data/imagenet/subset/ILSVRC2012_val_00031351.JPEG,31351,919,street sign
+ILSVRC2012_val_00036583,data/imagenet/subset/ILSVRC2012_val_00036583.JPEG,36583,699,"panpipe, pandean pipe, syrinx"
+ILSVRC2012_val_00009961,data/imagenet/subset/ILSVRC2012_val_00009961.JPEG,9961,514,cowboy boot
+ILSVRC2012_val_00023915,data/imagenet/subset/ILSVRC2012_val_00023915.JPEG,23915,537,"dogsled, dog sled, dog sleigh"

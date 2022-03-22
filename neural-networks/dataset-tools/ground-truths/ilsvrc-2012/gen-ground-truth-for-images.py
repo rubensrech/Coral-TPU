@@ -7,7 +7,7 @@ from pathlib import Path
 
 IMAGE_NAME_PATTERN = re.compile(r"ILSVRC2012_val_(\d+)")
 GROUND_TRUTH_MAP_FILE_LINE_PATTERN = re.compile(r"ILSVRC2012_val_(\d+)\.[a-zA-Z]+\s+(\d+)")
-GROUND_TRUTH_MAP_CLASS_IDX_OFFSET = 1
+CLASS_IDS_OFFSET = -1
 
 def load_labels_map(labels_file: str):
     with open(labels_file, "r", encoding="utf-8") as f:
@@ -19,7 +19,7 @@ def load_labels_map(labels_file: str):
         pair = re.split(r'[:\s]+', line.strip(), maxsplit=1)
         assert len(pair) == 2, f"Invalid line [{i}] in file [{labels_file}]"
 
-        class_id = int(pair[0])
+        class_id = int(pair[0]) + CLASS_IDS_OFFSET
         class_label = pair[1].strip()
         labels_map[class_id] = class_label
 
@@ -55,7 +55,7 @@ def gen_output_mapping(imgs_file: str, ground_truth_map: Dict[int, int], labels_
         assert len(match.groups()) == 1, f"Invalid line [{i}] in file [{imgs_file}] (#2)"
 
         img_id = int(match.group(1).strip())
-        class_id = ground_truth_map[img_id] + GROUND_TRUTH_MAP_CLASS_IDX_OFFSET
+        class_id = ground_truth_map[img_id]
         class_label = labels_map[class_id]
 
         out_mapping.append({
