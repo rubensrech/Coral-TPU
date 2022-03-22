@@ -226,12 +226,14 @@ class ModelsManager:
         # Detection
         Model(name='ssd_mobilenet_v2_coco_quant_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='rand_coco_subset_100'),
         Model(name='ssdlite_mobiledet_coco_qat_postprocess_edgetpu', task=ModelTask.Detection, labels='coco', dataset='rand_coco_subset_100'),
+        Model(name='efficientdet_lite3_512_ptq_edgetpu', task=ModelTask.Detection, labels='coco', dataset='rand_coco_subset_100'),
         Model(name='ssd_mobilenet_v2_catsdogs_quant_edgetpu', task=ModelTask.Detection, labels='pets', dataset='oxford-pets-100'),
         Model(name='ssd_mobilenet_v2_transf_learn_catsdogs_quant_edgetpu', task=ModelTask.Detection, labels='pets', dataset='oxford-pets-100'),
         Model(name='ssd_mobilenet_v2_subcoco14_quant_edgetpu', task=ModelTask.Detection, labels='subcoco', dataset='subcoco14'),
         Model(name='ssd_mobilenet_v2_subcoco14_transf_learn_quant_edgetpu', task=ModelTask.Detection, labels='subcoco', dataset='subcoco14'),
         # Classification
         Model(name='tfhub_tf2_resnet_50_imagenet_ptq_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
+        Model(name='inception_v3_299_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
         Model(name='inception_v4_299_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
         Model(name='efficientnet-edgetpu-S_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
         Model(name='efficientnet-edgetpu-M_quant_edgetpu', task=ModelTask.Classification, labels='imagenet', dataset='ILSVRC2012_val_100'),
