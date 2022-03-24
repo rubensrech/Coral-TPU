@@ -28,18 +28,17 @@ CC_FLAGS+=-DLOGGING_LEVEL=$(LOGGING_LEVEL) -DMAX_ERRORS_PER_IT=$(MAX_ERRORS_PER_
 EDGETPU_RUNTIME_DIR=$(CURDIR)/../edgetpu_runtime
 TENSORFLOW_DIR=$(CURDIR)/../tensorflow
 TFLITE_AARCH64_LIB_DIR=$(CURDIR)/../tflite-aarch64/lib
-LOG_HELPER_DIR=$(CURDIR)/../include
 
-run_model: run_model.cpp $(LOG_HELPER_DIR)/log_helper.c
+run_model: run_model.cpp
 	aarch64-linux-gnu-g++ $^ -o $@ $(CC_FLAGS) \
 		-I$(EDGETPU_RUNTIME_DIR)/libedgetpu/ \
 		-L$(EDGETPU_RUNTIME_DIR)/libedgetpu/direct/aarch64/ \
 		-I$(TENSORFLOW_DIR) \
 		-I$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/downloads/flatbuffers/include \
-		-I$(LOG_HELPER_DIR) \
 		-L$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/gen/generic-aarch64_armv8-a/lib \
 		-L$(TFLITE_AARCH64_LIB_DIR) \
-		-ltensorflow-lite -l:libedgetpu.so.1.0 -lpthread -lm -ldl
+		-L/usr/local/lib -I/usr/local/include \
+		-lLogHelper -ltensorflow-lite -l:libedgetpu.so.1.0 -lpthread -lm -ldl
 
 clean:
 	rm -f run_model

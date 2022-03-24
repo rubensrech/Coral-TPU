@@ -13,7 +13,7 @@ Logger.setLevel(Logger.Level.TIMING)
 
 
 FILE_FULL_PATH = Path(__file__).parent.absolute()
-sys.path.insert(0, f'{FILE_FULL_PATH}/../include/log_helper_swig_wraper')
+sys.path.insert(0, f'{FILE_FULL_PATH}/../libLogHelper/build')
 import log_helper as lh
 
 MAX_ERR_PER_IT = 500
@@ -44,7 +44,7 @@ def init_log_file(model_file, input_file, nimages):
     lh.set_max_errors_iter(MAX_ERR_PER_IT)
     lh.set_iter_interval_print(1)
 
-    Logger.info(f"Log file is `{lh.get_log_file_name()}`")
+    # Logger.info(f"Log file is `{lh.get_log_file_name()}`")
 
 def create_interpreter(model_file):
     t0 = time.perf_counter()

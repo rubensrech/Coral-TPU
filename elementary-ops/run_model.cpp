@@ -19,7 +19,8 @@
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 
-#include "log_helper.h"
+#include "log_helper.hpp"
+using namespace log_helper
 
 // Logging levels
 #define LOGGING_LEVEL_NONE      0
